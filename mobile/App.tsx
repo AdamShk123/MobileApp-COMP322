@@ -1,41 +1,37 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- *
- * @format
- */
-
 import React from 'react';
-import type {PropsWithChildren} from 'react';
 import {
-  SafeAreaView,
-  ScrollView,
-  StatusBar,
-  StyleSheet,
-  Text,
-  useColorScheme,
-  View,
+   TextInput,
+   SafeAreaView,
+   StyleSheet,
 } from 'react-native';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
-import {
-  Colors,
-} from 'react-native/Libraries/NewAppScreen';
+import StartMenu from './components/StartMenu';
+import CreateAccount from './components/CreateAccount';
+import Home from './components/Home';
 
-function App(): JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
-  return (
-    <ScrollView style={styles.appBackground}>
-        <Text style={styles.title}>
-            D&D Universe
-        </Text>        
-    </ScrollView>
-  );
+export type RootStackParamList = {
+    StartMenu: undefined,
+    CreateAccount: undefined,
+    Home: undefined,
 }
+
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const App = () => {
+  return (
+    <SafeAreaView style={{flex: 1}}>
+       <NavigationContainer>
+            <Stack.Navigator>
+                <Stack.Screen name="StartMenu" component={StartMenu} options={{headerShown: false}}/>
+                <Stack.Screen name="CreateAccount" component={CreateAccount} options={{headerShown: false}}/>
+                <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
+            </Stack.Navigator>
+        </NavigationContainer>
+    </SafeAreaView>
+  );
+};
 
 const styles = StyleSheet.create({
     appBackground: {

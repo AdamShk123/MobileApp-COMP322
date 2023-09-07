@@ -1,6 +1,5 @@
 import React from 'react';
 import {
-   TextInput,
    SafeAreaView,
    StyleSheet,
 } from 'react-native';
@@ -32,21 +31,5 @@ const App = () => {
     </SafeAreaView>
   );
 };
-
-const styles = StyleSheet.create({
-    appBackground: {
-        backgroundColor: 'black'
-    },
-    title: {
-        color: 'red',
-        fontSize: 40,
-        fontWeight: 'bold',
-        fontFamily: 'Arial',
-        textAlign: 'center',
-        marginTop: 40,
-        textShadowRadius: 5,
-        textShadowColor: 'rgb(200,0,0)',
-    },
-});
 
 export default App;

@@ -1,19 +1,30 @@
 import React from 'react';
-import {
-   SafeAreaView,
-   StyleSheet,
-} from 'react-native';
+import { SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import StartMenu from './components/StartMenu';
 import CreateAccount from './components/CreateAccount';
-import Home from './components/Home';
+import CampaignsList from './components/CampaignsList';
+import LogIn from './components/LogIn';
+import Friends from './components/Friends';
+import Notifications from './components/Notifications';
+import Settings from './components/Settings';
+import Profile from './components/Profile';
+import AddCampaign from './components/AddCampaign';
+import Campaign from './components/Campaign';
 
 export type RootStackParamList = {
     StartMenu: undefined,
     CreateAccount: undefined,
-    Home: undefined,
+    CampaignsList: undefined,
+    Campaign: undefined,
+    LogIn: undefined,
+    Friends: undefined,
+    Settings: undefined,
+    Notifications: undefined,
+    Profile: undefined,
+    AddCampaign: undefined,
 }
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -22,10 +33,17 @@ const App = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
        <NavigationContainer>
-            <Stack.Navigator>
-                <Stack.Screen name="StartMenu" component={StartMenu} options={{headerShown: false}}/>
-                <Stack.Screen name="CreateAccount" component={CreateAccount} options={{headerShown: false}}/>
-                <Stack.Screen name="Home" component={Home} options={{headerShown: false}}/>
+            <Stack.Navigator initialRouteName='StartMenu'>
+                <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false}}/>
+                <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false}}/>
+                <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: true}}/>
+                <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
+                <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
+                <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>
+                <Stack.Screen name='Notifications' component={Notifications} options={{headerShown: false}}/>
+                <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
+                <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
+                <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
             </Stack.Navigator>
         </NavigationContainer>
     </SafeAreaView>

@@ -1,6 +1,6 @@
 import React from 'react'
-import {StyleSheet, Pressable, View, Text} from 'react-native'
-import colors from '../styles'
+import {View, Text, Pressable, StyleSheet} from 'react-native'
+import appStyles from '../styles'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 import { RootStackParamList } from '../App';
 
@@ -10,42 +10,38 @@ type Props = {
 
 const StartMenu = ({navigation}: Props) => {
     return (
-        <View style={{flex:1, alignSelf:'center'}}>
-            <Text style={styles.title}>D&D Universe</Text>
-            <View style={styles.view}>
-                <Pressable style={[styles.button,colors.backgroundBlack]}>
-                    <Text style={[colors.textWhite, styles.text]}>Log In</Text>
+        <View style={[myStyles.componentView, appStyles.background]}>
+            <Text style={[appStyles.header, myStyles.header]}>App Title</Text>
+            <View style={myStyles.buttonView}>
+                <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('CampaignsList')}>
+                    <Text style={appStyles.text}>Log In</Text>
                 </Pressable>
-                <Pressable style={[styles.button,colors.backgroundBlack]} onPress={() => navigation.navigate('CreateAccount')}>
-                    <Text style={[colors.textWhite, styles.text]}>Create Account</Text>
+                <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('CreateAccount')}>
+                    <Text style={appStyles.text}>Create Account</Text>
                 </Pressable>
             </View>
         </View>
     );
 };
 
-const styles = StyleSheet.create({
-    button: {
-        borderRadius: 3,
-        marginBottom: 5,
-    },
-    view: {
+const myStyles = StyleSheet.create({
+    componentView: {
         flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
-        flexDirection: 'column',
     },
-    text: {
-        padding: 3,
-        fontSize: 15,
+    buttonView: {
+        flex:1,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
-    title: {
-        color: 'red',
-        fontSize: 24,
-        fontWeight: 'bold',
-        textShadowRadius: 5,
+    button: {
+        marginBottom: 10,
+        alignItems: 'center',
+        minWidth: '50%',
+    },
+    header: {
+        marginTop: 10,
     }
-});
-
+})
 
 export default StartMenu;

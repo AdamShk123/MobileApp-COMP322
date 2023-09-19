@@ -1,7 +1,9 @@
+import 'react-native-gesture-handler';
 import React from 'react';
 import { SafeAreaView } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 
 import StartMenu from './components/StartMenu';
 import CreateAccount from './components/CreateAccount';
@@ -27,13 +29,15 @@ export type RootStackParamList = {
     AddCampaign: undefined,
 }
 
-const Stack = createNativeStackNavigator<RootStackParamList>();
+//const Stack = createNativeStackNavigator<RootStackParamList>();
+
+const Stack = createDrawerNavigator<RootStackParamList>();
 
 const App = () => {
   return (
     <SafeAreaView style={{flex: 1}}>
        <NavigationContainer>
-            <Stack.Navigator initialRouteName='StartMenu'>
+            <Stack.Navigator initialRouteName='StartMenu' backBehavior='history'>
                 <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false}}/>
                 <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false}}/>
                 <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: true}}/>

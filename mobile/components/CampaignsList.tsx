@@ -1,5 +1,5 @@
 import React from 'react'
-import {StyleSheet, Pressable, Text, View, FlatList} from 'react-native'
+import {StyleSheet, Pressable, Text, View, FlatList, Image} from 'react-native'
 import appStyles from '../styles';         
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
@@ -35,8 +35,16 @@ const Item = ({campaignName, dmName}: Campaign) => {
 
     return(
         <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('Campaign')}>
-            <Text style={[appStyles.text, myStyles.text]}>{campaignName}</Text>
-            <Text style={[appStyles.text, myStyles.text]}>{dmName}</Text>
+            <View style={myStyles.textButton}>
+                <Text style={[appStyles.text, myStyles.text]}>{campaignName}</Text>
+                <Text style={[appStyles.text, myStyles.text]}>{dmName}</Text>
+            </View>
+            <View style={myStyles.pictureView}>
+                <Image style={myStyles.picture} source={require('../resources/smiley.jpg')}/>
+            </View>
+            <View style={myStyles.pictureView}>
+                <Image style={myStyles.picture} source={require('../resources/kebab.png')}/>
+            </View>
         </Pressable>
     );
 };
@@ -80,19 +88,32 @@ const myStyles = StyleSheet.create({
         color: 'black',
     },
     button: {
+        maxHeight: 50,
         flex: 1,
         flexDirection: 'row',
         marginBottom: 10,
-        alignItems: 'center',
-        justifyContent: 'flex-start',
         padding: 2,
+    },
+    textButton: {
+        flex: 3,
+        flexDirection: 'column'
+    },
+    picture: {
+        maxHeight: 40,
+        maxWidth: 40,
+    },
+    pictureView: {
+        margin: 2,
+        alignContent: 'center',
+        justifyContent: 'center',
     },
     text: {
         marginRight: 15,
     },
     addButton: {
-        maxHeight: 50,
+        minHeight: 50,
         alignItems: 'center',
+        justifyContent: 'center',
     }
 });
 

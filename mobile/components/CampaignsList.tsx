@@ -35,12 +35,12 @@ const Item = ({campaignName, dmName}: Campaign) => {
 
     return(
         <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('Campaign')}>
+            <View style={myStyles.pictureView}>
+                <Image style={myStyles.picture} source={require('../resources/smiley.jpg')}/>
+            </View>
             <View style={myStyles.textButton}>
                 <Text style={[appStyles.text, myStyles.text]}>{campaignName}</Text>
                 <Text style={[appStyles.text, myStyles.text]}>{dmName}</Text>
-            </View>
-            <View style={myStyles.pictureView}>
-                <Image style={myStyles.picture} source={require('../resources/smiley.jpg')}/>
             </View>
             <View style={myStyles.pictureView}>
                 <Image style={myStyles.picture} source={require('../resources/kebab.png')}/>

@@ -1,19 +1,21 @@
 import { StyleSheet } from "react-native";
 
-const colors = StyleSheet.create({
-    backgroundBlack: {
-        backgroundColor: 'black',
+const appStyles = StyleSheet.create({
+    button: {
+        backgroundColor: 'grey',
     },
-    backgroundWhite: {
-        backgroundColor: 'white',
-    },
-    textBlack: {
+    text: {
         color: 'black',
+        fontSize: 18,
     },
-    textWhite: {
-        color: 'white',
+    header: {
+        fontSize: 28,
+        color: 'grey',
+    },
+    background: {
+       backgroundColor: 'black', 
     }
 });
 
-export default colors;
+export default appStyles;
 

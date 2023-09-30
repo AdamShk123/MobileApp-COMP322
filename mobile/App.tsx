@@ -34,7 +34,7 @@ export type RootStackParamList = {
 
 const Stack = createDrawerNavigator<RootStackParamList>();
 
-select();
+select().then((data) => console.log(data)).catch((error) => console.log(error));
 
 const App = () => {
   return (

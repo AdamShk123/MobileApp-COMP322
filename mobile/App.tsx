@@ -15,6 +15,7 @@ import Settings from './components/Settings';
 import Profile from './components/Profile';
 import AddCampaign from './components/AddCampaign';
 import Campaign from './components/Campaign';
+import select from './services/DatabaseService';
 
 export type RootStackParamList = {
     StartMenu: undefined,
@@ -32,6 +33,8 @@ export type RootStackParamList = {
 //const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const Stack = createDrawerNavigator<RootStackParamList>();
+
+select();
 
 const App = () => {
   return (

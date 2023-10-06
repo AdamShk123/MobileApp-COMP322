@@ -1,6 +1,5 @@
-import 'react-native-url-polyfill/auto'
-
-import { createClient, PostgrestSingleResponse, SupabaseClient } from '@supabase/supabase-js';
+import 'react-native-url-polyfill/auto';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { API_KEY, API_URL } from '@env';
 
 class DatabaseService {
@@ -15,15 +14,92 @@ class DatabaseService {
         this.supabase = createClient(this.url, this.key);
     }
 
-    public async getData(): Promise<PostgrestSingleResponse<any[]>> {
-        const data = await this.supabase.from('player').select('*');
-        return data;
+    public update(from: string, row: any): any{
+        const query = this.supabase.from(from).update(row).select();
+        return query; 
     }
 
-    public async createUser(email: string, password: string) : Promise<any>{
+    /**
+    * API call to database, returning selected columns from selected table
+    *  
+    * @param from - selected table
+    * @param select - selected columns
+    * @returns the query object
+    */
+    public select(from: string, select: any): any {
+        const query = this.supabase.from(from).select(select);
+        return query;
+    }
+
+    public delete(from: string): any{
+        const query = this.supabase.from(from).delete().select();
+        return query;
+    } 
+
+    public insert(from: string, row: any): any{
+        const query = this.supabase.from(from).insert(row).select();
+        return query;
+    }
+    
+    /**
+    * API call to database, returning selected columns from selected table
+    *  
+    * @param query - initial query returned from select, update, insert, etc. functions
+    * @param column - name of column to be checked
+    * @param condition - conditional operator like 'eq' (=), 'neq' (!=), etc.
+    * @param value - value being checked against
+    * @returns the query object
+    */
+    public filter(query: any, column: string, condition: string, value: string): any {
+        return query.filter(column, condition, value);
+    }
+
+    /**
+    * API call to database, returning selected columns from selected table
+    *  
+    * @param query - initial query
+    * @param column - name of column by which result will be ordered
+    * @param ascending - if true, then values will start at lowest value and go to highest 
+    * @returns the query object
+    */
+    public order(query: any, column: string, ascending: boolean): any{
+        return query.order(column, {ascending: ascending});
+    }
+    
+    /**
+    * API call to database, returning selected columns from selected table
+    *  
+    * @param query - final query object
+    * @returns the API call as a promise after calling await
+    */
+    public async await(query: any) : Promise<any> {
+        const val = await query;
+        return val;
+    }
+
+    /**
+    * Creates user via the database authenticator
+    *
+    * @param email - email of new user 
+    * @param password - password of new user
+    * @returns a promise confirming creation of new user   
+    */
+    public async createUser(email: string, password: string): Promise<any>{
         const data = await this.supabase.auth.signUp({email, password});
         return data;
     }
+
+    /**
+    * Logs user in via the database authenticator
+    *
+    * @param email - email of new user 
+    * @param password - password of new user
+    * @returns a promise confirming login 
+    */
+    public async logIn(email: string, password: string): Promise<any> {
+        const data = await this.supabase.auth.signInWithPassword({email, password});
+        return data;
+    } 
 }
 
 export default DatabaseService;

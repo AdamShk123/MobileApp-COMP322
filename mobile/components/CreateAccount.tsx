@@ -1,8 +1,7 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Button, TextInput } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
-import { Button, Input } from '@rneui/themed';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 
@@ -18,7 +17,7 @@ const CreateAccount = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     function buttonPressed() : void {
-        if(password.length > 8 && password == confirm){
+        if(password == confirm){
             facadeService.createUser(email, password).then((data) => console.log(data));
             navigation.navigate('StartMenu');
         }
@@ -28,10 +27,10 @@ const CreateAccount = ({navigation}: Props) => {
         <View style={[appStyles.background,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Create Account'}/>
             <View style={myStyles.formView}>
-                <Input inputStyle={myStyles.input} label={'Email'} placeholder={'Enter Your Email...'} onChangeText={(value) => setEmail(value)}/>
-                <Input style={myStyles.input} label={'Password'} placeholder={'Enter Your Password...'} onChangeText={(value) => setPassword(value)}/>
-                <Input style={myStyles.input} label={'Confirm Password'} placeholder={'Enter Your Password Again...'} onChangeText={(value) => setConfirm(value)}/>
-                <Button buttonStyle={myStyles.button} title='Create Account' onPress={() => buttonPressed()}/>
+                <TextInput style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setEmail(value)}/>
+                <TextInput style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setPassword(value)}/>
+                <TextInput style={myStyles.input} placeholder='confirm password' onChangeText={(value) => setConfirm(value)}/>
+                <Button title='Create Account' onPress={() => buttonPressed()}/>
             </View>
         </View>
     );
@@ -46,7 +45,9 @@ const myStyles = StyleSheet.create({
     formView: {
         flex: 1,
         flexDirection: 'column',
-        maxWidth: '100%',
+        maxWidth: '60%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -56,6 +57,7 @@ const myStyles = StyleSheet.create({
     input: {
         color: 'grey',
         minWidth: '100%',
+        backgroundColor: 'white',
     }
 })
 

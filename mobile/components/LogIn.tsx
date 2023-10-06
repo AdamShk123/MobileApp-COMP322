@@ -1,10 +1,10 @@
 import React, { useContext, useState } from 'react';
-import { StyleSheet, View } from 'react-native';
+import { StyleSheet, View, Button, TextInput } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
-import { Button, Input } from '@rneui/themed';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
+import { UserType } from '../types/User';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -17,17 +17,20 @@ const LogIn = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     function buttonPressed() : void {
-        //facadeService
-        navigation.navigate('CampaignsList');
+        const data = facadeService.logIn(email,password);
+        data.then((data: UserType) => {
+            const promise = facadeService.getUser(data.id);
+            promise.then((data) => navigation.navigate('CampaignsList', {id: data.id}));
+        });
     }
 
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Log In'}/>
             <View style={myStyles.formView}>
-                <Input inputStyle={myStyles.input} label={'Email'} placeholder={'Enter Your Email...'} onChangeText={(value) => setEmail(value)}/>
-                <Input style={myStyles.input} label={'Password'} placeholder={'Enter Your Password...'} onChangeText={(value) => setPassword(value)}/>
-                <Button buttonStyle={myStyles.button} title='Log In' onPress={() => buttonPressed()}/>
+                <TextInput style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setEmail(value)}/>
+                <TextInput style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setPassword(value)}/>
+                <Button title='Log In' onPress={() => buttonPressed()}/>
             </View>
         </View>
     );
@@ -42,7 +45,9 @@ const myStyles = StyleSheet.create({
     formView: {
         flex: 1,
         flexDirection: 'column',
-        maxWidth: '100%',
+        maxWidth: '60%',
+        marginLeft: 'auto',
+        marginRight: 'auto',
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -53,6 +58,7 @@ const myStyles = StyleSheet.create({
     input: {
         color: 'grey',
         minWidth: '100%',
+        backgroundColor: 'white',
     }
 })
 

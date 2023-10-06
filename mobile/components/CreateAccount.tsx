@@ -1,7 +1,7 @@
-import React, { useContext, useState } from 'react';
-import { StyleSheet, View, Button, TextInput } from 'react-native';
+import React, { useContext, useEffect, useState } from 'react';
+import { StyleSheet, View, Button, TextInput, Text } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, emailRegex, passwordRegex } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 
@@ -9,34 +9,51 @@ type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
+
 const CreateAccount = ({navigation}: Props) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [confirm, setConfirm] = useState('');
+    const [form, setForm] = useState({email: '', password: '', confirm: ''});
+    const [disabled, setDisabled] = useState(true);
+    const [error, setError] = useState('');
 
     const facadeService = useContext(ServiceContext);
 
-    function buttonPressed() : void {
-        if(password == confirm){
-            facadeService.createUser(email, password).then((data) => console.log(data));
-            navigation.navigate('StartMenu');
-        }
+    function onButtonPressed() : void {
+        facadeService.createUser(form.email, form.password).then((data) => console.log(data));
+        navigation.navigate('StartMenu');
     }
+
+    useEffect(() => {
+        if(form.password != form.confirm || form.password.length == 0){
+            setDisabled(true);
+            setError('The passwords don\'t match!');
+        }
+        else if(!passwordRegex.test(form.password)) {
+            setDisabled(true);
+            setError('Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character');
+        }
+        else if(!emailRegex.test(form.email)){
+            setDisabled(true);
+            setError('Provide a proper email address!');
+        }
+        else {
+            setDisabled(false);
+            setError('');
+        }
+    }, [form]);
 
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Create Account'}/>
             <View style={myStyles.formView}>
-                <TextInput style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setEmail(value)}/>
-                <TextInput style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setPassword(value)}/>
-                <TextInput style={myStyles.input} placeholder='confirm password' onChangeText={(value) => setConfirm(value)}/>
-                <Button title='Create Account' onPress={() => buttonPressed()}/>
+                <Text style={myStyles.warningText}>{error}</Text>
+                <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password, confirm: form.confirm})}/>
+                <TextInput value={form.password} style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value, confirm: form.confirm})}/>
+                <TextInput value={form.confirm} style={myStyles.input} placeholder='confirm password' onChangeText={(value) => setForm({email: form.email, password: form.password, confirm: value})}/>
+                <Button disabled={disabled} title='Create Account' onPress={() => onButtonPressed()}/>
             </View>
         </View>
     );
 };
-
-
 
 const myStyles = StyleSheet.create({
     componentView: {
@@ -51,6 +68,11 @@ const myStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    warningText: {
+        color: 'red',
+        fontWeight: 'bold',
+        fontSize: 16,
+    },
     button: {
         backgroundColor: 'grey', 
     },
@@ -60,7 +82,5 @@ const myStyles = StyleSheet.create({
         backgroundColor: 'white',
     }
 })
-
-
 
 export default CreateAccount;

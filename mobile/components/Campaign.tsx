@@ -26,10 +26,6 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={'Campaign'}/>
             <View style={myStyles.mapView}>
                 <Button title='map'/>
-                <Text>Campaign Name: {data.name}</Text>
-                <Text>Campaign ID: {data.id}</Text>
-                <Text>Campaign Status(Ongoing): {data.ongoing}</Text>
-                <Text>Campaign Created Date: {data.created.toString()}</Text>
             </View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>

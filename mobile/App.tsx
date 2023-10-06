@@ -28,6 +28,9 @@ const facadeService = new FacadeService(userService, campaignService);
 
 export const ServiceContext = createContext(facadeService);
 
+export const emailRegex : RegExp = new RegExp('.*.@..*');
+export const passwordRegex: RegExp = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$')
+
 export type RootStackParamList = {
     StartMenu: undefined,
     CreateAccount: undefined,

@@ -19,7 +19,12 @@ const AddCampaign = ({navigation}: Props) => {
     function buttonPressed(){
         const id = facadeService.getCurrentUser().id;
         const promise = facadeService.createCampaign({cname: name, cdmid: id}); 
-        promise.then(() => navigation.navigate('CampaignsList', {id: id}));
+        promise.then(() => {
+            setName('');
+            setDisabled(true);
+            setError('');
+            navigation.navigate('CampaignsList', {id: id});
+        });
     }
 
     useEffect(() => {

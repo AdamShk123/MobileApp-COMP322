@@ -53,9 +53,9 @@ const App = () => {
         <ServiceContext.Provider value={facadeService}>
             <NavigationContainer>
                 <Stack.Navigator initialRouteName='StartMenu' backBehavior='history'>
-                    <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false}}/>
-                    <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false}}/>
-                    <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false}}/>
+                    <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
+                    <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
+                    <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
                     <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
                     <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
                     <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>

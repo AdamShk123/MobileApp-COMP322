@@ -19,6 +19,9 @@ const CreateAccount = ({navigation}: Props) => {
 
     function onButtonPressed() : void {
         facadeService.createUser(form.email, form.password).then((data) => console.log(data));
+        setForm({email: '', password: '', confirm: ''});
+        setDisabled(true);
+        setError('');
         navigation.navigate('StartMenu');
     }
 
@@ -43,7 +46,6 @@ const CreateAccount = ({navigation}: Props) => {
 
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
-            <HeaderBar navigation={navigation} headerText={'Create Account'}/>
             <View style={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password, confirm: form.confirm})}/>

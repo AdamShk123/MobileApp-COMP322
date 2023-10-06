@@ -19,11 +19,10 @@ const LogIn = ({navigation}: Props) => {
 
     function buttonPressed() : void {
         facadeService.logIn(form.email,form.password).then((data: UserType) => {
-            const promise = facadeService.getUser(data.id);
             setForm({email: '', password: ''});
             setDisabled(true);
             setError('');
-            promise.then((data) => navigation.navigate('CampaignsList', {id: data.id}));
+            navigation.navigate('CampaignsList', {id: data.id});
         }).catch(() => setError('Password or email are incorrect!'));
     }
 
@@ -46,7 +45,7 @@ const LogIn = ({navigation}: Props) => {
         <View style={[appStyles.background,myStyles.componentView]}>
             <View style={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
-                <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.email})}/>
+                <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password})}/>
                 <TextInput value={form.password} style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value})}/>
                 <Button disabled={disabled} title='Log In' onPress={() => buttonPressed()}/>
             </View>

@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, Button, TextInput, Text } from 'react-native';
+import { StyleSheet, View, Button, TextInput, Text, Alert } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext, emailRegex, passwordRegex } from '../App';
 import appStyles from '../styles';
@@ -22,6 +22,7 @@ const CreateAccount = ({navigation}: Props) => {
         setForm({email: '', password: '', confirm: ''});
         setDisabled(true);
         setError('');
+        Alert.alert('Accout Created', 'Check email and click on confirmation link to finish.');
         navigation.navigate('StartMenu');
     }
 

@@ -1,4 +1,4 @@
-import { StyleSheet, View, Button, Text } from "react-native";
+import { StyleSheet, View, Button, Text, Image } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
@@ -26,6 +26,7 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={'Campaign'}/>
             <View style={myStyles.mapView}>
                 <Button title='map'/>
+                <Image style={{width: '100%', height: '100%'}} source={{uri: 'https://flbygwtoslnwzjpqkbpp.supabase.co/storage/v1/object/public/images/roshar.png?t=2023-10-06T22%3A10%3A32.433Z'}}/>
             </View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>

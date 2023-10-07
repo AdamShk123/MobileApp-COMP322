@@ -13,7 +13,7 @@ const StartMenu = ({navigation}: Props) => {
         <View style={[myStyles.componentView, appStyles.background]}>
             <Text style={[appStyles.header, myStyles.header]}>App Title</Text>
             <View style={myStyles.buttonView}>
-                <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('CampaignsList')}>
+                <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('LogIn')}>
                     <Text style={appStyles.text}>Log In</Text>
                 </Pressable>
                 <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('CreateAccount')}>

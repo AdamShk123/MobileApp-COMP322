@@ -1,40 +1,25 @@
-import React from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import {StyleSheet, Pressable, Text, View, FlatList, Image} from 'react-native'
 import appStyles from '../styles';         
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { NativeStackScreenProps, NativeStackNavigationProp} from '@react-navigation/native-stack';
+import { RootStackParamList, ServiceContext } from '../App';
 import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
+import { CampaignType } from '../types/Campaign';
 
-type Props = {
-    navigation: NativeStackNavigationProp<RootStackParamList>;
-}
+type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
 type Campaign = {
     campaignName: string;
     dmName: string;
+    campaignID: string;
 }
 
-const listData: Campaign[] = [
-    {
-        campaignName: 'The Unsleeping City',
-        dmName: 'Brennan Lee Mulligan'
-    },
-    {
-        campaignName: 'Escape from the Bloodkeep',
-        dmName: 'Adam'
-    },
-    {
-        campaignName: 'Arctopolis',
-        dmName: 'Liam'
-    },
-];
-
-const Item = ({campaignName, dmName}: Campaign) => {
+const Item = ({campaignName, dmName = 'Adam', campaignID}: Campaign) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
 
     return(
-        <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('Campaign')}>
+        <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
             <View style={myStyles.pictureView}>
                 <Image style={myStyles.picture} source={require('../resources/smiley.jpg')}/>
             </View>
@@ -49,12 +34,19 @@ const Item = ({campaignName, dmName}: Campaign) => {
     );
 };
 
-const CampaignsList = ({navigation}: Props) => {
+const CampaignsList = ({navigation, route}: Props) => {
+    const [list, setList] = useState<CampaignType[]>([]);
+    const facadeService = useContext(ServiceContext);
+
+    useEffect(() => {
+        facadeService.getCampaigns(route.params.id).then((data) => setList(data));
+    }, [route.params])
+    
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Campaigns List'}/>
             <View style={myStyles.listView}>
-                <FlatList data={listData} renderItem={({item}) => <Item campaignName={item.campaignName} dmName={item.dmName}/>}/>
+                <FlatList data={list} renderItem={({item}) => <Item campaignName={item.name} dmName={'Adam'} campaignID={item.id}/>}/>
             </View>
             <Pressable style={[appStyles.button, myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
                 <Text style={appStyles.text}>Add Campaign</Text>

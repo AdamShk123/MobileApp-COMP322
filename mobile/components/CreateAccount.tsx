@@ -1,14 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Button, TextInput, Text, Alert } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext, emailRegex, passwordRegex } from '../App';
+import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
-import HeaderBar from './HeaderBar';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
+const emailRegex : RegExp = new RegExp('.*.@..*');
+const passwordRegex: RegExp = new RegExp('^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$');
 
 const CreateAccount = ({navigation}: Props) => {
     const [form, setForm] = useState({email: '', password: '', confirm: ''});
@@ -26,14 +27,14 @@ const CreateAccount = ({navigation}: Props) => {
         navigation.navigate('StartMenu');
     }
 
-    useEffect(() => {
-        if(form.password != form.confirm || form.password.length == 0){
+    useEffect(() => { 
+        if(!passwordRegex.test(form.password)) {
+            setDisabled(true);
+            setError('Password doesn\'t meet requirements');
+        }
+        else if(form.password != form.confirm){
             setDisabled(true);
             setError('The passwords don\'t match!');
-        }
-        else if(!passwordRegex.test(form.password)) {
-            setDisabled(true);
-            setError('Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character');
         }
         else if(!emailRegex.test(form.email)){
             setDisabled(true);
@@ -48,6 +49,7 @@ const CreateAccount = ({navigation}: Props) => {
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
             <View style={myStyles.formView}>
+                <Text style={myStyles.requirementsText}>Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character</Text>
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password, confirm: form.confirm})}/>
                 <TextInput value={form.password} style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value, confirm: form.confirm})}/>
@@ -70,6 +72,11 @@ const myStyles = StyleSheet.create({
         marginRight: 'auto',
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    requirementsText: {
+        color: 'white',
+        fontWeight: 'normal',
+        fontSize: 16,
     },
     warningText: {
         color: 'red',

@@ -1,6 +1,6 @@
 import { View, Button, TextInput, StyleSheet, Text } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext, campaignNameRegex } from '../App';
+import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
@@ -8,6 +8,8 @@ import { useContext, useEffect, useState } from "react";
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
+
+const campaignNameRegex: RegExp = new RegExp('[0-9a-zA-Z-:!\' ]*.{1,}$');
 
 const AddCampaign = ({navigation}: Props) => {
     const [name, setName] = useState('');

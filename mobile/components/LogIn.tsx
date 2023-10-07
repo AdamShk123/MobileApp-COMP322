@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from 'react';
 import { StyleSheet, View, Button, TextInput, Text } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext, passwordRegex, emailRegex } from '../App';
+import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
-import HeaderBar from './HeaderBar';
 import { UserType } from '../types/User';
 
 type Props = {
@@ -12,7 +11,6 @@ type Props = {
 
 const LogIn = ({navigation}: Props) => {
     const [form, setForm] = useState({email: '', password: ''});
-    const [disabled, setDisabled] = useState(true);
     const [error, setError] = useState('');
 
     const facadeService = useContext(ServiceContext);
@@ -20,26 +18,10 @@ const LogIn = ({navigation}: Props) => {
     function buttonPressed() : void {
         facadeService.logIn(form.email,form.password).then((data: UserType) => {
             setForm({email: '', password: ''});
-            setDisabled(true);
             setError('');
             navigation.navigate('CampaignsList', {id: data.id});
         }).catch(() => setError('Password or email are incorrect!'));
     }
-
-    useEffect(() => {
-        if(!passwordRegex.test(form.password)) {
-            setDisabled(true);
-            setError('Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character');
-        }
-        else if(!emailRegex.test(form.email)){
-            setDisabled(true);
-            setError('Provide a proper email address!');
-        }
-        else {
-            setDisabled(false);
-            setError('');
-        }
-    }, [form]);
 
     return (
         <View style={[appStyles.background,myStyles.componentView]}>
@@ -47,7 +29,7 @@ const LogIn = ({navigation}: Props) => {
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password})}/>
                 <TextInput value={form.password} style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value})}/>
-                <Button disabled={disabled} title='Log In' onPress={() => buttonPressed()}/>
+                <Button title='Log In' onPress={() => buttonPressed()}/>
             </View>
         </View>
     );

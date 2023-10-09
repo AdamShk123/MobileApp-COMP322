@@ -1,4 +1,4 @@
-import { View, Button, TextInput, StyleSheet, Text } from "react-native";
+import { View, Button, TextInput, StyleSheet, Text, Pressable } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
@@ -18,7 +18,7 @@ const AddCampaign = ({navigation}: Props) => {
 
     const facadeService = useContext(ServiceContext);
 
-    function buttonPressed(){
+    function onButtonPressed(){
         const id = facadeService.getCurrentUser().id;
         const promise = facadeService.createCampaign({cname: name, cdmid: id}); 
         promise.then(() => {
@@ -41,12 +41,14 @@ const AddCampaign = ({navigation}: Props) => {
     }, [name])
 
     return (
-        <View style={[appStyles.background, myStyles.componentView]}>
+        <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Add Campaign'}/>
             <View style={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
-                <TextInput value={name} style={myStyles.input} placeholder='Enter campaign name...' onChangeText={(value) => setName(value)}/>
-                <Button disabled={disabled} title='Create Campaign' onPress={() => buttonPressed()}/>
+                <TextInput placeholderTextColor={appStyles.secondaryText.color} value={name} style={[myStyles.input, appStyles.primaryText, appStyles.h6]} placeholder='enter campaign name...' onChangeText={(value) => setName(value)}/>
+                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
+                    <Text style={[appStyles.h4, appStyles.primaryText]}>Log In</Text>
+                </Pressable>
             </View>
         </View>
     );
@@ -71,13 +73,17 @@ const myStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     button: {
-        backgroundColor: 'grey',
-        //minWidth: '100%',
+        minWidth: '60%',
+        minHeight: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '10%',
     },
     input: {
-        color: 'grey',
         minWidth: '100%',
-        backgroundColor: 'white',
+        marginBottom: 10,
+        borderBottomColor: '#999999',
+        borderBottomWidth: 1,
     }
 })
 

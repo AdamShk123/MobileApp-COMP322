@@ -1,5 +1,5 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, Button, TextInput, Text } from 'react-native';
+import { StyleSheet, View, Pressable, TextInput, Text } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
@@ -15,7 +15,7 @@ const LogIn = ({navigation}: Props) => {
 
     const facadeService = useContext(ServiceContext);
 
-    function buttonPressed() : void {
+    function onButtonPressed() : void {
         facadeService.logIn(form.email,form.password).then((data: UserType) => {
             setForm({email: '', password: ''});
             setError('');
@@ -24,13 +24,16 @@ const LogIn = ({navigation}: Props) => {
     }
 
     return (
-        <View style={[appStyles.background,myStyles.componentView]}>
+        <View style={[appStyles.primaryBackground,myStyles.componentView]}>
+            <Text style={[appStyles.h1, appStyles.primaryText, myStyles.title]}>Log In</Text>
             <View style={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
-                <TextInput value={form.email} style={myStyles.input} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password})}/>
-                <TextInput value={form.password} style={myStyles.input} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value})}/>
-                <Button title='Log In' onPress={() => buttonPressed()}/>
+                <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.email} style={[myStyles.input, appStyles.primaryText, appStyles.h6]} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password})}/>
+                <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.password} style={[myStyles.input, appStyles.primaryText, appStyles.h6]} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value})}/>
             </View>
+            <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
+                <Text style={[appStyles.h4, appStyles.primaryText]}>Log In</Text>
+            </Pressable>
         </View>
     );
 };
@@ -38,6 +41,7 @@ const LogIn = ({navigation}: Props) => {
 const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
+        alignItems: 'center',
     },
     formView: {
         flex: 1,
@@ -48,19 +52,33 @@ const myStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
+    requirementsText: {
+        color: 'white',
+        fontWeight: 'normal',
+        fontSize: 16,
+    },
     warningText: {
         color: 'red',
         fontWeight: 'bold',
         fontSize: 16,
     },
     button: {
-        backgroundColor: 'grey',
+        minWidth: '60%',
+        minHeight: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        marginBottom: '10%',
     },
     input: {
-        color: 'grey',
         minWidth: '100%',
-        backgroundColor: 'white',
+        marginBottom: 10,
+        borderBottomColor: '#999999',
+        borderBottomWidth: 1,
+    },
+    title: {
+        marginTop: 20,
     }
-})
+});
+
 
 export default LogIn;

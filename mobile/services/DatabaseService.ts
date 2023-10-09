@@ -14,6 +14,10 @@ class DatabaseService {
         this.supabase = createClient(this.url, this.key);
     }
 
+    public getURL(bucket: string, id: string): string {
+        return (this.supabase.storage.from(bucket).getPublicUrl(id).data.publicUrl + '/roshar.png');
+    }
+
     public update(from: string, row: any): any{
         const query = this.supabase.from(from).update(row).select();
         return query; 

@@ -3,9 +3,10 @@ import UserService from "./UserService";
 import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
 import { UserType } from "../types/User";
+import DatabaseService from "./DatabaseService";
 
 class FacadeService {
-    constructor(private userService: UserService, private campaignService: CampaignService){}
+    constructor(private userService: UserService, private campaignService: CampaignService, private databaseService: DatabaseService){}
 
     public async createUser(email: string, password: string) : Promise<UserType> {
         const data = this.userService.createUser(email, password);
@@ -39,6 +40,10 @@ class FacadeService {
 
     public async createCampaign(row: any) : Promise<void> {
         return this.campaignService.createCampaign(row);
+    }
+
+    public getURL(bucket: string, id: string){
+        return this.databaseService.getURL(bucket, id);
     }
 }
 

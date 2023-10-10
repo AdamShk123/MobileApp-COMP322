@@ -32,8 +32,8 @@ export const ServiceContext = createContext(facadeService);
 export type RootStackParamList = {
     StartMenu: undefined,
     CreateAccount: undefined,
-    CampaignsList: {id: string},
-    Campaign: {id: string},
+    CampaignsList: {id?: string},
+    Campaign: {id?: string},
     LogIn: undefined,
     Friends: undefined,
     Settings: undefined,

@@ -1,4 +1,4 @@
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
+import { PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
 import UserService from "./UserService";
 import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
@@ -38,12 +38,12 @@ class FacadeService {
         return this.campaignService.updateCampaignPlayedData(campaignID,this.userService.currentUser.id);
     }
 
-    public async createCampaign(row: any) : Promise<void> {
+    public async createCampaign(row: any) : Promise<CampaignType> {
         return this.campaignService.createCampaign(row);
     }
 
-    public getURL(bucket: string, id: string){
-        return this.databaseService.getURL(bucket, id);
+    public Supabase(id: string, uri: string): void {
+        this.databaseService.uploadImage(id, uri).then((result) => console.log(result));
     }
 }
 

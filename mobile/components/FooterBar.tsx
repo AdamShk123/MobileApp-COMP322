@@ -1,9 +1,9 @@
-import { View, Pressable, Text, StyleSheet, Image } from "react-native";
+import { View, Pressable, Text, StyleSheet } from "react-native";
 import appStyles from "../styles";
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList } from '../App';
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import * as i1 from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as i2 from 'react-native-vector-icons/MaterialIcons';
 
@@ -13,41 +13,57 @@ type Props = {
 
 const FooterBar = ({current} : Props) => { 
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-    const facadeService = useContext(ServiceContext);
-    const currentUser = facadeService.getCurrentUser();
     const [screen, setScreen] = useState('CampaignsList');
-
-    const ref = useRef<Text>(null);
+    const [disabled, setDisabled] = useState(true);
 
     useEffect(() => {
-        console.log(current);
         switch (current) {
             case 'CampaignsList': {
+                setDisabled(false);
                 setScreen('CampaignsList');
                 break;
             }
             case 'Campaign': {
+                setDisabled(false);
                 setScreen('Campaign');
                 break;
             }
             case 'Notifications': {
+                setDisabled(false);
                 setScreen('Notifications');
                 break;
             }
             case 'Friends': {
+                setDisabled(false);
                 setScreen('Friends');
+                break;
+            }
+            case 'LogIn': {
+                setDisabled(true);
+                break;
+            }
+            case 'CreateAccount': {
+                setDisabled(true);
+                break;
+            }
+            case 'StartMenu': {
+                setDisabled(true);
                 break;
             }
         }
     }, [current]);
+
+    if(disabled){
+        return (<View></View>);
+    }
     
     return (
         <View style={[myStyles.insideView, appStyles.secondaryBackground]}>
-            <Pressable style={myStyles.button} onPress={() => navigation.navigate('CampaignsList', {id: currentUser.id})}>
+            <Pressable style={myStyles.button} onPress={() => navigation.navigate('CampaignsList', {})}>
                 <i1.default name="view-list" style={{color: screen == 'CampaignsList' ? appStyles.primaryText.color : appStyles.secondaryText.color}} size={appStyles.h2.fontSize}/>
-                <Text ref={ref} style={[appStyles.h6, {color: screen == 'CampaignsList' ? appStyles.primaryText.color : appStyles.secondaryText.color}]}>List</Text>
+                <Text style={[appStyles.h6, {color: screen == 'CampaignsList' ? appStyles.primaryText.color : appStyles.secondaryText.color}]}>List</Text>
             </Pressable>
-            <Pressable style={myStyles.button} onPress={() => navigation.navigate('Campaign',{id: '21'})}>
+            <Pressable style={myStyles.button} onPress={() => navigation.navigate('Campaign',{})}>
                 <i1.default name="knife-military" style={{color: screen == 'Campaign' ? appStyles.primaryText.color : appStyles.secondaryText.color}} size={appStyles.h2.fontSize} color={appStyles.primaryText.color}/>
                 <Text style={[appStyles.h6, {color: screen == 'Campaign' ? appStyles.primaryText.color : appStyles.secondaryText.color}]}>Campaign</Text>
             </Pressable>
@@ -70,11 +86,13 @@ const myStyles = StyleSheet.create({
         flexGrow: 1,
     },
     insideView: {
-        maxHeight: 60,
-        minHeight: 60,
+        maxHeight: 70,
+        minHeight: 70,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
+        borderColor: '#F5B40F',
+        borderTopWidth: 2,
     },
 });
 

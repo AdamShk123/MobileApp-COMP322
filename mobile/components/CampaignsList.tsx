@@ -6,6 +6,7 @@ import { RootStackParamList, ServiceContext } from '../App';
 import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import { CampaignType } from '../types/Campaign';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
@@ -13,14 +14,13 @@ type Campaign = {
     campaignName: string;
     dmName: string;
     campaignID: string;
-    imageURL: string;
 }
 
-const Item = ({campaignName, dmName = 'Adam', campaignID, imageURL}: Campaign) => {
+const Item = ({campaignName, dmName = 'Adam', campaignID}: Campaign) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     return(
         <Pressable style={[myStyles.itemView]}>
-            <ImageBackground style={myStyles.image} source={{uri: imageURL}}>
+            <ImageBackground style={myStyles.image} source={{uri: 'https://flbygwtoslnwzjpqkbpp.supabase.co/storage/v1/object/public/campaigns/' + campaignID + '/main.png'}}>
                 <View style={myStyles.overlay}/>
                 <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
                     <Text style={[appStyles.primaryText, appStyles.h3]}>{campaignName}</Text>
@@ -35,18 +35,20 @@ const CampaignsList = ({navigation, route}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     useEffect(() => {
-        facadeService.getCampaigns(route.params.id).then((data) => setList(data));
+        if(route.params.id){
+            facadeService.getCampaigns(route.params.id).then((data) => setList(data));
+        }
     }, [route.params])
     
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Campaigns List'}/>
-            {/* <ScrollView ref={scroll} nestedScrollEnabled={true} horizontal={true}> */}
-            <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item imageURL={facadeService.getURL('campaigns',item.id)} campaignName={item.name} dmName={'Adam'} campaignID={item.id}/>}/>
-            {/* </ScrollView> */}
-            <Pressable style={[myStyles.addButton, appStyles.secondaryBackground]} onPress={() => navigation.navigate('AddCampaign')}>
-                <Text style={[appStyles.h6, appStyles.primaryText]}>Add Campaign</Text>
-            </Pressable>
+            <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item campaignName={item.name} dmName={'Adam'} campaignID={item.id}/>}/>
+            <View style={myStyles.buttonOverlay}>
+                <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
+                    <Icon name='add-circle' style={[appStyles.h1, appStyles.primaryText]}/>
+                </Pressable>
+            </View>
         </View>
    );
 };
@@ -64,6 +66,11 @@ const myStyles = StyleSheet.create({
         width: '100%',
         height: '100%',
         backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    buttonOverlay: {
+        position: 'absolute',
+        top: 75,
+        left: 20,
     },
     image: {
         width: 1000,
@@ -88,7 +95,6 @@ const myStyles = StyleSheet.create({
         backgroundColor: 'rgba(0,0,90,0.4)',
     },
     addButton: {
-        minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',
     }

@@ -5,7 +5,7 @@ import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from 'react';
 import { CampaignType } from "../types/Campaign";
-
+import { API_URL } from '@env'
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
 
@@ -39,7 +39,7 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <View style={myStyles.mapView}>
                 <Button title='map'/>
-                <Image style={{width: '100%', height: '100%'}} source={{uri: 'https://flbygwtoslnwzjpqkbpp.supabase.co/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
+                <Image style={{width: '100%', height: '100%'}} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
             </View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>

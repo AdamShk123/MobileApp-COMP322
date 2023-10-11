@@ -19,12 +19,14 @@ const CreateAccount = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     function onButtonPressed() : void {
-        facadeService.createUser(form.email, form.password).then((data) => console.log(data));
-        setForm({email: '', password: '', confirm: ''});
-        setDisabled(true);
-        setError('');
-        Alert.alert('Accout Created', 'Check email and click on confirmation link to finish.');
-        navigation.navigate('StartMenu');
+        if(!disabled){
+            facadeService.createUser(form.email, form.password).then((data) => console.log(data));
+            setForm({email: '', password: '', confirm: ''});
+            setDisabled(true);
+            setError('');
+            Alert.alert('Accout Created', 'Check email and click on confirmation link to finish.');
+            navigation.navigate('StartMenu');
+        }
     }
 
     useEffect(() => { 
@@ -58,7 +60,7 @@ const CreateAccount = ({navigation}: Props) => {
                 {/* <Button disabled={disabled} title='Create Account' onPress={() => onButtonPressed()}/> */}
             </View>
             <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
-                <Text style={[appStyles.h4, appStyles.primaryText]}>Create Account</Text>
+                <Text style={[appStyles.h4, {color: disabled ? appStyles.secondaryText.color : appStyles.primaryText.color}]}>Create Account</Text>
             </Pressable>
         </View>
     );

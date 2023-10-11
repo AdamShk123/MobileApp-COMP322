@@ -1,8 +1,8 @@
 import 'react-native-gesture-handler';
-import React, { createContext, useRef, useState } from 'react';
-import { SafeAreaView } from 'react-native';
+import React, { createContext, useCallback, useRef, useState } from 'react';
+import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
-import { createDrawerNavigator } from '@react-navigation/drawer';
+import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
 
 import StartMenu from './components/StartMenu';
 import CreateAccount from './components/CreateAccount';
@@ -20,6 +20,7 @@ import DatabaseService from './services/DatabaseService';
 import UserService from './services/UserService';
 import CampaignService from './services/CampaignService';
 import FacadeService from './services/FacadeService';
+import appStyles from './styles';
 
 
 const databaseService = new DatabaseService();
@@ -44,6 +45,35 @@ export type RootStackParamList = {
 
 const Stack = createDrawerNavigator<RootStackParamList>();
 
+const Drawer = (props: DrawerContentComponentProps) => { 
+    const nav = useCallback((screen: string) => {
+        props.navigation.navigate(screen, {});
+    }, [props]);
+
+    return (
+        <View style={[myStyles.drawerView, appStyles.secondaryBackground]}>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Profile')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Profile</Text>
+            </Pressable>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('CampaignsList')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Campaigns List</Text>
+            </Pressable>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Friends')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Friends</Text>
+            </Pressable>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Notifications')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Notifications</Text>
+            </Pressable>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Settings')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Settings</Text>
+            </Pressable>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('StartMenu')}>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>Sign Out</Text>
+            </Pressable>
+        </View>
+    );
+};
+
 const App = () => {
     const [name, setName] = useState('');
     const navigationRef = useNavigationContainerRef();
@@ -59,7 +89,7 @@ const App = () => {
         <SafeAreaView style={{flex: 1}}>
             <ServiceContext.Provider value={facadeService}>
                 <NavigationContainer ref={navigationRef} onStateChange={() => changed()}>
-                    <Stack.Navigator initialRouteName='StartMenu' backBehavior='history'>
+                    <Stack.Navigator drawerContent={(props) => Drawer(props)} initialRouteName='StartMenu' backBehavior='history'>
                         <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
                         <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
                         <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
@@ -77,5 +107,19 @@ const App = () => {
         </SafeAreaView>
     );
 };
+
+const myStyles = StyleSheet.create({
+    drawerView: {
+        flex: 1, 
+        flexDirection: 'column', 
+        padding: 10,
+        borderColor: appStyles.primaryText.color,
+        borderRightWidth: 2,
+    },
+    drawerButton: {
+        width: '100%',
+        height: 50
+    }
+})
 
 export default App;

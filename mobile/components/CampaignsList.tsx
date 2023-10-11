@@ -7,24 +7,23 @@ import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import { CampaignType } from '../types/Campaign';
 import Icon from 'react-native-vector-icons/Ionicons';
-
+import { API_URL } from '@env';
 type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
 type Campaign = {
     campaignName: string;
-    dmName: string;
     campaignID: string;
 }
 
-const Item = ({campaignName, dmName = 'Adam', campaignID}: Campaign) => {
+const Item = ({campaignName, campaignID}: Campaign) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
     return(
-        <Pressable style={[myStyles.itemView]}>
-            <ImageBackground style={myStyles.image} source={{uri: 'https://flbygwtoslnwzjpqkbpp.supabase.co/storage/v1/object/public/campaigns/' + campaignID + '/main.png'}}>
+        <Pressable style={[myStyles.itemView]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
+            <ImageBackground style={myStyles.image} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + campaignID + '/main.png'}}>
                 <View style={myStyles.overlay}/>
-                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
+                <View style={[appStyles.secondaryBackground, myStyles.button]}>
                     <Text style={[appStyles.primaryText, appStyles.h3]}>{campaignName}</Text>
-                </Pressable>
+                </View>
             </ImageBackground>
         </Pressable>
     );
@@ -43,7 +42,7 @@ const CampaignsList = ({navigation, route}: Props) => {
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Campaigns List'}/>
-            <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item campaignName={item.name} dmName={'Adam'} campaignID={item.id}/>}/>
+            <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item campaignName={item.name} campaignID={item.id}/>}/>
             <View style={myStyles.buttonOverlay}>
                 <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
                     <Icon name='add-circle' style={[appStyles.h1, appStyles.primaryText]}/>
@@ -92,7 +91,7 @@ const myStyles = StyleSheet.create({
         minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: 'rgba(0,0,90,0.4)',
+        backgroundColor: 'rgba(0,0,90,0.7)',
     },
     addButton: {
         alignItems: 'center',

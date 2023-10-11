@@ -42,8 +42,8 @@ class FacadeService {
         return this.campaignService.createCampaign(row);
     }
 
-    public Supabase(id: string, uri: string): void {
-        this.databaseService.uploadImage(id, uri).then((result) => console.log(result));
+    public uploadImage(bucket: string, id: string, uri: string): Promise<CampaignType> {
+        return this.databaseService.uploadImage(bucket, id, uri);
     }
 }
 

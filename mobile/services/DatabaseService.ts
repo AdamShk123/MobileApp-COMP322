@@ -16,8 +16,8 @@ class DatabaseService {
         // this.supabase.storage.from('campaigns').upload('21/main.png','');
     }
 
-    public async uploadImage(id: string, uri: string) : Promise<any> {
-        return this.supabase.storage.from('campaigns').upload(id +'/main.png', decode(uri), {contentType: 'image/png'});
+    public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {
+        return this.supabase.storage.from(bucket).upload(id +'/main.png', decode(uri), {contentType: 'image/png'});
     }
 
     public update(from: string, row: any): any{

@@ -59,7 +59,7 @@ const AddCampaign = ({navigation}: Props) => {
             setDisabled(false);
             setError('');
         }
-    }, [name])
+    }, [name, selectedImage])
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>

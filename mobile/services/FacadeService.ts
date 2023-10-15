@@ -1,11 +1,12 @@
-import { PostgrestSingleResponse } from "@supabase/supabase-js";
+import { PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
 import UserService from "./UserService";
 import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
 import { UserType } from "../types/User";
+import DatabaseService from "./DatabaseService";
 
 class FacadeService {
-    constructor(private userService: UserService, private campaignService: CampaignService){}
+    constructor(private userService: UserService, private campaignService: CampaignService, private databaseService: DatabaseService){}
 
     public async createUser(email: string, password: string) : Promise<UserType> {
         const data = this.userService.createUser(email, password);
@@ -37,8 +38,12 @@ class FacadeService {
         return this.campaignService.updateCampaignPlayedData(campaignID,this.userService.currentUser.id);
     }
 
-    public async createCampaign(row: any) : Promise<void> {
+    public async createCampaign(row: any) : Promise<CampaignType> {
         return this.campaignService.createCampaign(row);
+    }
+
+    public uploadImage(bucket: string, id: string, uri: string): Promise<CampaignType> {
+        return this.databaseService.uploadImage(bucket, id, uri);
     }
 }
 

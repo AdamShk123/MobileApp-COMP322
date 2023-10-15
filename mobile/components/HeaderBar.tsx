@@ -3,6 +3,8 @@ import appStyles from "../styles";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import { DrawerActions } from "@react-navigation/native";
+import Icon from 'react-native-vector-icons/Ionicons';
+
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
     headerText: string;
@@ -10,33 +12,32 @@ type Props = {
 
 const HeaderBar = ({navigation, headerText}: Props) => {
     return (
-        <View style={myStyles.containerView}>
-            <View style={myStyles.headerView}>
-                <Pressable style={appStyles.button} onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
-                    <Text>Menu</Text>
+        <View style={[myStyles.containerView, appStyles.secondaryBackground]}>
+                <Pressable style={appStyles.secondaryBackground} onPress={() => navigation.dispatch(DrawerActions.openDrawer())}>
+                    {/* <Text style={[appStyles.primaryText, appStyles.h6]}>Menu</Text> */}
+                    <Icon name='menu' style={[appStyles.primaryText, appStyles.h2]}/>
                 </Pressable>
-                <Text style={[appStyles.header, myStyles.header]}>{headerText}</Text>
-                <Pressable style={appStyles.button} onPress={() => navigation.navigate('Profile')}>
-                    <Text>Profile</Text>
+                <Text style={[appStyles.h3, appStyles.primaryText]}>{headerText}</Text>
+                <Pressable style={appStyles.secondaryBackground} onPress={() => navigation.navigate('Profile')}>
+                    {/* <Text style={[appStyles.primaryText, appStyles.h6]}>Profile</Text> */}
+                    <Icon name='person-circle' style={[appStyles.primaryText, appStyles.h2]}/>
                 </Pressable>
-            </View>
         </View>
     ); 
 };
 
 const myStyles = StyleSheet.create({
     containerView: {
+        maxHeight: 50,
         minHeight: 50,
-    },
-    headerView: {
         flex: 1,
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'space-between',
-        backgroundColor: 'grey',
-    },
-    header: {
-        color: 'black',
+        borderColor: '#F5B40F',
+        borderBottomWidth: 2,
+        paddingLeft: 10,
+        paddingRight: 10,
     },
 });
 

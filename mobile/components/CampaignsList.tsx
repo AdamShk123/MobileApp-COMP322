@@ -1,35 +1,30 @@
 import React, { useContext, useEffect, useState } from 'react'
-import {StyleSheet, Pressable, Text, View, FlatList, Image} from 'react-native'
+import {StyleSheet, Pressable, Text, View, FlatList, ScrollView, ImageBackground} from 'react-native'
 import appStyles from '../styles';         
 import { NativeStackScreenProps, NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import { CampaignType } from '../types/Campaign';
-
+import Icon from 'react-native-vector-icons/Ionicons';
+import { API_URL } from '@env';
 type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
 type Campaign = {
     campaignName: string;
-    dmName: string;
     campaignID: string;
 }
 
-const Item = ({campaignName, dmName = 'Adam', campaignID}: Campaign) => {
+const Item = ({campaignName, campaignID}: Campaign) => {
     const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-
     return(
-        <Pressable style={[appStyles.button, myStyles.button]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
-            <View style={myStyles.pictureView}>
-                <Image style={myStyles.picture} source={require('../resources/smiley.jpg')}/>
-            </View>
-            <View style={myStyles.textButton}>
-                <Text style={[appStyles.text, myStyles.text]}>{campaignName}</Text>
-                <Text style={[appStyles.text, myStyles.text]}>{dmName}</Text>
-            </View>
-            <View style={myStyles.pictureView}>
-                <Image style={myStyles.picture} source={require('../resources/kebab.png')}/>
-            </View>
+        <Pressable style={[myStyles.itemView]} onPress={() => navigation.navigate('Campaign', {id: campaignID})}>
+            <ImageBackground style={myStyles.image} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + campaignID + '/main.png'}}>
+                <View style={myStyles.overlay}/>
+                <View style={[appStyles.secondaryBackground, myStyles.button]}>
+                    <Text style={[appStyles.primaryText, appStyles.h3]}>{campaignName}</Text>
+                </View>
+            </ImageBackground>
         </Pressable>
     );
 };
@@ -39,18 +34,20 @@ const CampaignsList = ({navigation, route}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     useEffect(() => {
-        facadeService.getCampaigns(route.params.id).then((data) => setList(data));
+        if(route.params.id){
+            facadeService.getCampaigns(route.params.id).then((data) => setList(data));
+        }
     }, [route.params])
     
     return (
-        <View style={[appStyles.background,myStyles.componentView]}>
+        <View style={[appStyles.primaryBackground,myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Campaigns List'}/>
-            <View style={myStyles.listView}>
-                <FlatList data={list} renderItem={({item}) => <Item campaignName={item.name} dmName={'Adam'} campaignID={item.id}/>}/>
+            <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item campaignName={item.name} campaignID={item.id}/>}/>
+            <View style={myStyles.buttonOverlay}>
+                <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
+                    <Icon name='add-circle' style={[appStyles.h1, appStyles.primaryText]}/>
+                </Pressable>
             </View>
-            <Pressable style={[appStyles.button, myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
-                <Text style={appStyles.text}>Add Campaign</Text>
-            </Pressable>
         </View>
    );
 };
@@ -60,50 +57,43 @@ const myStyles = StyleSheet.create({
         flex: 1,
         flexDirection: 'column',
     },
-    containerView: {
-        minHeight: 50,
-    },
-    headerView: {
-        flex: 1,
-        flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: 'grey',
-    },
     listView: {
         flex: 1,
-        marginTop: 10,
-        paddingLeft: 10,
-        paddingRight: 10,
     },
-    header: {
-        color: 'black',
+    overlay: {
+        position: 'absolute',
+        width: '100%',
+        height: '100%',
+        backgroundColor: 'rgba(0,0,0,0.4)',
     },
-    button: {
-        maxHeight: 50,
-        flex: 1,
-        flexDirection: 'row',
-        marginBottom: 10,
-        padding: 2,
+    buttonOverlay: {
+        position: 'absolute',
+        top: 75,
+        left: 20,
     },
-    textButton: {
-        flex: 3,
-        flexDirection: 'column'
-    },
-    picture: {
-        maxHeight: 40,
-        maxWidth: 40,
-    },
-    pictureView: {
-        margin: 2,
-        alignContent: 'center',
+    image: {
+        width: 1000,
+        height: 1000,
+        alignItems: 'center',
         justifyContent: 'center',
     },
-    text: {
-        marginRight: 15,
+    itemView: {
+        width: '100%',
+        height: 300,
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden',
+        borderBottomWidth: 5,
+        borderBottomColor: '#000050',
+    },
+    button: {
+        minWidth: '100%',
+        minHeight: 50,
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: 'rgba(0,0,90,0.7)',
     },
     addButton: {
-        minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',
     }

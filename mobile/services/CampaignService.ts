@@ -46,13 +46,14 @@ class CampaignService {
         return transformed;
     }
 
-    public async createCampaign(row: any): Promise<void>{
+    public async createCampaign(row: any): Promise<CampaignType>{
         const initial = this.databaseService.insert('campaign', row);
         const transformed = this.databaseService.await(initial).then((data) => {
             const item = data['data'][0];
             const initial = this.databaseService.insert('plays', {playerid: item['cdmid'], campaignid: item['cid']});
             const promise = this.databaseService.await(initial).then((data) => console.log(data));
-            return promise;
+            const campaign: CampaignType =  {name: item['cname'], id: item['cid'], created: item['ccreated'], ongoing: item['congoing']}
+            return campaign;
         });
         return transformed;
     }

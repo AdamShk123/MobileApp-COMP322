@@ -1,6 +1,7 @@
 import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { API_KEY, API_URL } from '@env';
+import { decode } from 'base64-arraybuffer';
 
 class DatabaseService {
 
@@ -12,6 +13,11 @@ class DatabaseService {
         this.url = API_URL;
         this.key = API_KEY;
         this.supabase = createClient(this.url, this.key);
+        // this.supabase.storage.from('campaigns').upload('21/main.png','');
+    }
+
+    public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {
+        return this.supabase.storage.from(bucket).upload(id +'/main.png', decode(uri), {contentType: 'image/png'});
     }
 
     public update(from: string, row: any): any{

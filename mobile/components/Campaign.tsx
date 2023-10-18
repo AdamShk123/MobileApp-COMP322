@@ -43,6 +43,12 @@ const Campaign = ({navigation, route}: Props) => {
             </View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>
+                <Image style={{width: '50%', height: '50%'}} source={{uri: 'https://static.vecteezy.com/system/resources/previews/014/376/091/original/dice-illustration-in-3d-isometric-style-png.png'}>
+                function getRandomInt(min, max) {
+                  min = Math.ceil(min);
+                  max = Math.floor(max);
+                  return Math.floor(Math.random() * (max - min) + min); // The maximum is exclusive and the minimum is inclusive
+                }
             </View>
         </View>
     );

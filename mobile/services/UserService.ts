@@ -52,6 +52,40 @@ class UserService {
 
         return transformed;
     }
+
+    public async getFriends(id: string): Promise<UserType[]> {
+        const initial = this.databaseService.select('friend','player!friend_playerid2_fkey(*)');
+        const filtered = this.databaseService.filter(initial, 'playerid1', 'eq', id);
+        // const ordered = this.databaseService.order(filtered, 'plast', true);
+
+        const transformed = this.databaseService.await(filtered).then((data) => {
+            const rawData : any[] = data['data'];
+            const friendsList : UserType[] = [];
+            rawData.forEach((item) => {
+                friendsList.push({id: item['player']['pid'], email: item['player']['pemail'], nickname: item['player']['pnickname'], first: item['player']['pfirst'], last: item['player']['plast'], created: item['player']['pcreated']})
+            });
+            return friendsList;
+        });
+
+        return transformed;
+    }
+
+    public async searchUsers(searchText: string): Promise<UserType[]> {
+        const initial = this.databaseService.select('player', '*');
+        const filtered = this.databaseService.filter(initial, 'pemail', 'like', '%' + searchText + '%');
+
+        const transformed = this.databaseService.await(filtered).then((data) => {
+            const rawData: any[] = data['data'];
+            const usersList : UserType[] = [];
+            console.log(data);
+            rawData.forEach((item) => {
+                usersList.push({id: item['pid'], email: item['pemail'], nickname: item['pnickname'], first: item['pfirst'], last: item['plast'], created: item['pcreated']});
+            });
+            return usersList;
+        });
+
+        return transformed;
+    }
 }
 
 export default UserService;

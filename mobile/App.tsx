@@ -13,6 +13,7 @@ import Notifications from './components/Notifications';
 import Settings from './components/Settings';
 import Profile from './components/Profile';
 import AddCampaign from './components/AddCampaign';
+import AddFriend from './components/AddFriend';
 import Campaign from './components/Campaign';
 import FooterBar from './components/FooterBar';
 
@@ -36,11 +37,12 @@ export type RootStackParamList = {
     CampaignsList: {id?: string},
     Campaign: {id?: string},
     LogIn: undefined,
-    Friends: undefined,
+    Friends: {id?: string},
     Settings: undefined,
     Notifications: undefined,
     Profile: undefined,
     AddCampaign: undefined,
+    AddFriend: undefined,
 }
 
 const Stack = createDrawerNavigator<RootStackParamList>();
@@ -100,6 +102,7 @@ const App = () => {
                         <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
                         <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
                         <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
+                        <Stack.Screen name='AddFriend' component={AddFriend} options={{headerShown: false}}/>
                     </Stack.Navigator>
                     <FooterBar current={name}/>
                 </NavigationContainer>

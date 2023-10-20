@@ -34,10 +34,11 @@ const CampaignsList = ({navigation, route}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     useEffect(() => {
+        console.log('f');
         if(route.params.id){
             facadeService.getCampaigns(route.params.id).then((data) => setList(data));
         }
-    }, [route.params])
+    }, [route.params.id])
     
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>

@@ -42,8 +42,17 @@ class FacadeService {
         return this.campaignService.createCampaign(row);
     }
 
+    public async getFriends(id: string): Promise<UserType[]>
+    {
+        return this.userService.getFriends(id);
+    }
+
     public uploadImage(bucket: string, id: string, uri: string): Promise<CampaignType> {
         return this.databaseService.uploadImage(bucket, id, uri);
+    }
+
+    public async searchUsers(searchText: string): Promise<UserType[]> {
+        return this.userService.searchUsers(searchText);
     }
 }
 

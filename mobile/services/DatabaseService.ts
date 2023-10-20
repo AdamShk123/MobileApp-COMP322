@@ -13,7 +13,6 @@ class DatabaseService {
         this.url = API_URL;
         this.key = API_KEY;
         this.supabase = createClient(this.url, this.key);
-        // this.supabase.storage.from('campaigns').upload('21/main.png','');
     }
 
     public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {

@@ -9,23 +9,6 @@ import { UserType } from "../types/User";
 
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>
-// const Tab = createMaterialTopTabNavigator();
-
-// const FriendsList = () => {
-//     return (
-//         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
-
-//         </View>
-//     );
-// }
-
-// const AddFriends = () => {
-//     return (
-//         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
-
-//         </View>
-//     );
-// }
 
 type ItemProps = {
     user: UserType;
@@ -52,12 +35,9 @@ const Friends = ({navigation, route}: Props) => {
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Friends'}/>
             <FlatList style={myStyles.componentView} data={list} renderItem={({item}) => <Item user={item}/>}/>
-            {/* <Tab.Navigator> */}
-            {/*     <Tab.Screen name="FriendsList" component={FriendsList}/> */}
-            {/*     <Tab.Screen name="AddFriends" component={AddFriends}/> */}
-            {<Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => {navigation.navigate('AddFriend')}}>
+            <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => {navigation.navigate('AddFriend')}}>
                 <Text style={[appStyles.primaryText, appStyles.h6]}>Add</Text>
-            </Pressable>/* </Tab.Navigator> */}
+            </Pressable>
         </View>
     );
 };

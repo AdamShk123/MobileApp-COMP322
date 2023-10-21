@@ -54,6 +54,10 @@ class FacadeService {
     public async searchUsers(searchText: string): Promise<UserType[]> {
         return this.userService.searchUsers(searchText);
     }
+
+    public subscribeCampaigns(callback: () => void): void {
+        this.databaseService.subscribeCampaigns(callback);
+    }
 }
 
 export default FacadeService;

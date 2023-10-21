@@ -33,12 +33,19 @@ const CampaignsList = ({navigation, route}: Props) => {
     const [list, setList] = useState<CampaignType[]>([]);
     const facadeService = useContext(ServiceContext);
 
-    useEffect(() => {
-        console.log('f');
-        if(route.params.id){
+    const func = () => {
+        if(route.params.id) {
             facadeService.getCampaigns(route.params.id).then((data) => setList(data));
         }
+    };
+
+    useEffect(() => {
+       func(); 
     }, [route.params.id])
+
+    useEffect(() => {
+        facadeService.subscribeCampaigns(func);
+    }, []);
     
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>

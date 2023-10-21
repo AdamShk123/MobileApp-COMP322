@@ -38,7 +38,7 @@ const AddFriend = ({navigation}: Props) => {
         } 
     }, [value]);
 
-    const func = () : UserType[] => {
+    const filterList = () : UserType[] => {
         if(value.length > 1){
             const nameRegex : RegExp = new RegExp('.*' + value + '.*');
             const newList : UserType[] = [];
@@ -57,7 +57,7 @@ const AddFriend = ({navigation}: Props) => {
             <HeaderBar navigation={navigation} headerText={'Add Friends'}/>
             <View style={[myStyles.formView]}>
                 <TextInput  value={value} onChangeText={(text) => setValue(text)} placeholderTextColor={appStyles.secondaryText.color} placeholder="enter nickname..." style={[appStyles.primaryBackground, myStyles.input, appStyles.primaryText]}/>
-                <FlatList style={myStyles.listView} data={func()} renderItem={({item}) => <Item user={item}/>}/>
+                <FlatList style={myStyles.listView} data={filterList()} renderItem={({item}) => <Item user={item}/>}/>
                 <Pressable style={[appStyles.secondaryBackground, myStyles.button]}>
                     <Text style={[appStyles.primaryText, appStyles.h6]}>Add</Text>
                 </Pressable>

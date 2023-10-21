@@ -1,11 +1,12 @@
-import { StyleSheet, View, Button, Text, Image } from "react-native";
+import { StyleSheet, View, Button, Text, Image, Animated } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef, createRef } from 'react';
 import { CampaignType } from "../types/Campaign";
-import { API_URL } from '@env'
+import { API_URL } from '@env';
+import { PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
 
@@ -34,13 +35,29 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
+    const scale = useRef(new Animated.Value(1)).current;
+    const translateX = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(0)).current;
+
+    const MapPinchHandler = Animated.event([{nativeEvent: {scale}}], {useNativeDriver: true});
+    const MapPanHandler = Animated.event([{nativeEvent: {translationX: translateX, translationY: translateY}}], {useNativeDriver: true});
+
+    const pinchRef = createRef()
+    const panRef = createRef()
+
     return (
         <View style={myStyles.componentView}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <View style={myStyles.mapView}>
-                <Button title='map'/>
-                <Image style={{width: '100%', height: '100%'}} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
-            </View>
+            <Button title='map'/>
+            <Animated.View style={myStyles.mapView}>
+                <PinchGestureHandler onGestureEvent={MapPinchHandler} ref={pinchRef} simultaneousHandlers={[panRef]}>
+                    <Animated.View>
+                        <PanGestureHandler onGestureEvent={MapPanHandler} ref={panRef} simultaneousHandlers={[pinchRef]}>
+                            <Animated.Image style={{width: '100%', height: '100%', transform: [{scale}, {translateX}, {translateY}]}} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
+                        </PanGestureHandler>
+                    </Animated.View>
+                </PinchGestureHandler>
+            </Animated.View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>
             </View>
@@ -51,13 +68,16 @@ const Campaign = ({navigation, route}: Props) => {
 const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
+        backgroundColor: '#606060',
     },
     mapView: {
         flex: 1,
+        backgroundColor: '#606060',
     },
     tabsView: {
         flex: 1,
+        backgroundColor: '#606060',
     }
 })
 

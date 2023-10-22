@@ -6,7 +6,7 @@ import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState, useRef, createRef } from 'react';
 import { CampaignType } from "../types/Campaign";
 import { API_URL } from '@env';
-import { PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler';
+import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
 
@@ -35,12 +35,48 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
-    const scale = useRef(new Animated.Value(1)).current;
+    const baseScale = useRef(new Animated.Value(1)).current;
+    const pinchScale = useRef(new Animated.Value(1)).current;
+    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
+    let prevValues = {x: 0, y: 0, scale: 1};
 
-    const MapPinchHandler = Animated.event([{nativeEvent: {scale}}], {useNativeDriver: true});
-    const MapPanHandler = Animated.event([{nativeEvent: {translationX: translateX, translationY: translateY}}], {useNativeDriver: true});
+    const MapPinchHandler = Animated.event([{
+        nativeEvent: {
+            scale: pinchScale
+        }}],
+        {
+            useNativeDriver: true
+        });
+
+    const pinchStateChanged = ({nativeEvent}) => {
+        if (nativeEvent.oldState === State.ACTIVE) {
+            prevValues.scale *= nativeEvent.scale;
+            baseScale.setValue(prevValues.scale);
+            pinchScale.setValue(1);
+        }
+    };
+
+    const panStateChanged = ({nativeEvent}) => {
+        if (nativeEvent.oldState === State.ACTIVE) {
+            prevValues.x += nativeEvent.translationX;
+            prevValues.y += nativeEvent.translationY;
+            translateX.setOffset(prevValues.x);
+            translateX.setValue(0);
+            translateY.setOffset(prevValues.y);
+            translateY.setValue(0);
+        }
+    };
+
+    const MapPanHandler = Animated.event([{
+        nativeEvent: {
+            translationX: translateX,
+            translationY: translateY
+        }}],
+        {
+            useNativeDriver: true
+        });
 
     const pinchRef = createRef()
     const panRef = createRef()
@@ -50,16 +86,19 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <Button title='map'/>
             <Animated.View style={myStyles.mapView}>
-                <PinchGestureHandler
-                    onGestureEvent={MapPinchHandler}
-                    ref={pinchRef}
-                    simultaneousHandlers={[panRef]}
+                <PanGestureHandler
+                    onGestureEvent={MapPanHandler}
+                    onHandlerStateChange={panStateChanged}
+                    ref={panRef}
+                    simultaneousHandlers={[pinchRef]}
+                    shouldCancelWhenOutside
                 >
                     <Animated.View>
-                        <PanGestureHandler
-                            onGestureEvent={MapPanHandler}
-                            ref={panRef}
-                            simultaneousHandlers={[pinchRef]}
+                        <PinchGestureHandler
+                            onGestureEvent={MapPinchHandler}
+                            onHandlerStateChange={pinchStateChanged}
+                            ref={pinchRef}
+                            simultaneousHandlers={[panRef]}
                         >
                             <Animated.Image
                                 style={{
@@ -75,9 +114,9 @@ const Campaign = ({navigation, route}: Props) => {
                                     uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
                                 }}
                             />
-                        </PanGestureHandler>
+                        </PinchGestureHandler>
                     </Animated.View>
-                </PinchGestureHandler>
+                </PanGestureHandler>
             </Animated.View>
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>

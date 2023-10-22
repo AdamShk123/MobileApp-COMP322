@@ -50,10 +50,31 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <Button title='map'/>
             <Animated.View style={myStyles.mapView}>
-                <PinchGestureHandler onGestureEvent={MapPinchHandler} ref={pinchRef} simultaneousHandlers={[panRef]}>
+                <PinchGestureHandler
+                    onGestureEvent={MapPinchHandler}
+                    ref={pinchRef}
+                    simultaneousHandlers={[panRef]}
+                >
                     <Animated.View>
-                        <PanGestureHandler onGestureEvent={MapPanHandler} ref={panRef} simultaneousHandlers={[pinchRef]}>
-                            <Animated.Image style={{width: '100%', height: '100%', transform: [{scale}, {translateX}, {translateY}]}} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
+                        <PanGestureHandler
+                            onGestureEvent={MapPanHandler}
+                            ref={panRef}
+                            simultaneousHandlers={[pinchRef]}
+                        >
+                            <Animated.Image
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    transform: [
+                                        {scale},
+                                        {translateX},
+                                        {translateY}
+                                    ]
+                                }}
+                                source={{
+                                    uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
+                                }}
+                            />
                         </PanGestureHandler>
                     </Animated.View>
                 </PinchGestureHandler>

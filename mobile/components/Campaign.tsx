@@ -133,6 +133,7 @@ const myStyles = StyleSheet.create({
     },
     mapView: {
         flex: 1,
+        zIndex: -1,
         backgroundColor: '#606060',
     },
     tabsView: {

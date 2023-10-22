@@ -28,22 +28,19 @@ const Friends = ({navigation, route}: Props) => {
     const facadeService = useContext(ServiceContext);
 
     const func = (result: any) => {
-        const l = list.map((item) => {
-            if(item.user.id in result){
-                return {user: item.user, online: true} as ItemProps;
-            }
-            return item;
-        })
-        setList(l);
-    };
-
-    useEffect(() => {
         facadeService.getFriends(route.params.id!).then((data) => {
-            const l = data.map((item) => {
+            const l = data.map((item: UserType) => {
+                if(item.id in result){
+                    return {user: item, online: true} as ItemProps;
+                }
                 return {user: item, online: false} as ItemProps;
             })
             setList(l);
         });
+    };
+
+    useEffect(() => {
+        func([]);    
     }, [route.params.id]);
 
     useEffect(() => {

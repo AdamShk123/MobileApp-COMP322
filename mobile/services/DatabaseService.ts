@@ -19,7 +19,6 @@ class DatabaseService {
         const channel = this.supabase.channel('campaignsList');
         channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
             callback();
-            console.log(payload);
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
@@ -28,17 +27,28 @@ class DatabaseService {
         });
     }
 
-    public subscribeOnline(callback: () => void): void {
+    public subscribeOnline(userID: string, callback: (presences: any) => void): void {
         const channel = this.supabase.channel('onlineStatus', {
             config: {
                 presence: {
-                    key: ''
+                    key: userID
                 }
             }
+        });
+        channel.on('presence', {event: 'sync'}, () => {
+            callback(channel.presenceState());
+            console.log('sync');
+        }).on('presence', {event: 'join'}, ({key, newPresences}) => {
+            callback(channel.presenceState());
+            console.log('join');
+        }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
+            callback(channel.presenceState());
+            console.log('leave');
         });
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
                 console.log('subscribed to the \'onlineStatus\' channel successfully');
+                channel.track({online: true});
             }
         });
     }

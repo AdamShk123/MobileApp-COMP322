@@ -58,6 +58,10 @@ class FacadeService {
     public subscribeCampaigns(callback: () => void): void {
         this.databaseService.subscribeCampaigns(callback);
     }
+
+    public subscribeOnline(userID: string, callback: (presences: any) => void): void {
+        this.databaseService.subscribeOnline(userID, callback);
+    }
 }
 
 export default FacadeService;

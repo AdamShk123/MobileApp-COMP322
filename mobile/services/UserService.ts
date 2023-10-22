@@ -77,7 +77,6 @@ class UserService {
         const transformed = this.databaseService.await(filtered).then((data) => {
             const rawData: any[] = data['data'];
             const usersList : UserType[] = [];
-            console.log(data);
             rawData.forEach((item) => {
                 usersList.push({id: item['pid'], email: item['pemail'], nickname: item['pnickname'], first: item['pfirst'], last: item['plast'], created: item['pcreated']});
             });

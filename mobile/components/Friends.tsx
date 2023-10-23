@@ -6,7 +6,6 @@ import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { UserType } from "../types/User";
 
-
 type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>
 
 type ItemProps = {

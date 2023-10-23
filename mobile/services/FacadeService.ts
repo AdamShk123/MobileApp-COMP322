@@ -1,4 +1,3 @@
-import { PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
 import UserService from "./UserService";
 import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
@@ -15,6 +14,11 @@ class FacadeService {
 
     public async logIn(email: string, password: string): Promise<UserType> {
         const data = this.userService.logIn(email, password);
+        return data;
+    }
+
+    public async logOut() {
+        const data = this.databaseService.logOut();
         return data;
     }
 
@@ -42,8 +46,7 @@ class FacadeService {
         return this.campaignService.createCampaign(row);
     }
 
-    public async getFriends(id: string): Promise<UserType[]>
-    {
+    public async getFriends(id: string): Promise<UserType[]> {
         return this.userService.getFriends(id);
     }
 

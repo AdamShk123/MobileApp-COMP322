@@ -1,8 +1,9 @@
 import 'react-native-gesture-handler';
-import React, { createContext, useCallback, useRef, useState } from 'react';
+import React, { createContext, useCallback, useState } from 'react';
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import StartMenu from './components/StartMenu';
 import CreateAccount from './components/CreateAccount';
@@ -47,9 +48,11 @@ export type RootStackParamList = {
 
 const Stack = createDrawerNavigator<RootStackParamList>();
 
-const Drawer = (props: DrawerContentComponentProps) => { 
-    const nav = useCallback((screen: string) => {
-        props.navigation.navigate(screen, {});
+const Tab = createBottomTabNavigator();
+
+const Drawer = (props: DrawerContentComponentProps) => {
+    const nav = useCallback((screen: string, args: any = {}) => {
+        props.navigation.navigate(screen, args);
     }, [props]);
 
     return (
@@ -60,7 +63,7 @@ const Drawer = (props: DrawerContentComponentProps) => {
             <Pressable style={myStyles.drawerButton} onPress={() => nav('CampaignsList')}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Campaigns List</Text>
             </Pressable>
-            <Pressable style={myStyles.drawerButton} onPress={() => nav('Friends')}>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Friends', {id: facadeService.getCurrentUser().id})}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Friends</Text>
             </Pressable>
             <Pressable style={myStyles.drawerButton} onPress={() => nav('Notifications')}>
@@ -69,7 +72,7 @@ const Drawer = (props: DrawerContentComponentProps) => {
             <Pressable style={myStyles.drawerButton} onPress={() => nav('Settings')}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Settings</Text>
             </Pressable>
-            <Pressable style={myStyles.drawerButton} onPress={() => nav('StartMenu')}>
+            <Pressable style={myStyles.drawerButton} onPress={() => {facadeService.logOut(); nav('StartMenu');}}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Sign Out</Text>
             </Pressable>
         </View>
@@ -118,6 +121,7 @@ const myStyles = StyleSheet.create({
         padding: 10,
         borderColor: appStyles.primaryText.color,
         borderRightWidth: 2,
+        justifyContent: 'space-between',
     },
     drawerButton: {
         width: '100%',

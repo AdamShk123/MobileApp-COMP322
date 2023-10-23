@@ -1,4 +1,4 @@
-import { View } from "react-native";
+import { View, StyleSheet } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList } from '../App';
 import appStyles from '../styles';
@@ -11,10 +11,16 @@ type Props = {
 
 const Profile = ({navigation}: Props) => {
     return (
-        <View style={{flex: 1}}>
+        <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Profile'}/>
         </View>
     );
 };
+
+const myStyles = StyleSheet.create({
+    componentView: {
+        flex: 1,
+    }
+});
 
 export default Profile;

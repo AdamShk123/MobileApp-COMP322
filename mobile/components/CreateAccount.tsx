@@ -57,7 +57,6 @@ const CreateAccount = ({navigation}: Props) => {
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.email} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password, confirm: form.confirm})}/>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.password} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value, confirm: form.confirm})}/>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.confirm} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='confirm password' onChangeText={(value) => setForm({email: form.email, password: form.password, confirm: value})}/>
-                {/* <Button disabled={disabled} title='Create Account' onPress={() => onButtonPressed()}/> */}
             </View>
             <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
                 <Text style={[appStyles.h4, {color: disabled ? appStyles.secondaryText.color : appStyles.primaryText.color}]}>Create Account</Text>

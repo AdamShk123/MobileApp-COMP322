@@ -142,7 +142,14 @@ class DatabaseService {
     public async logIn(email: string, password: string): Promise<any> {
         const data = await this.supabase.auth.signInWithPassword({email, password});
         return data;
-    } 
+    }
+
+    public async logOut() {
+        const promise = await this.supabase.auth.signOut().then(() => {
+            return this.supabase.removeAllChannels();
+        });
+        return promise;
+    }
 }
 
 export default DatabaseService;

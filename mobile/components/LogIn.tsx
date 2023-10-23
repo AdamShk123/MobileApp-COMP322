@@ -19,6 +19,7 @@ const LogIn = ({navigation}: Props) => {
         facadeService.logIn(form.email,form.password).then((data: UserType) => {
             setForm({email: '', password: ''});
             setError('');
+            facadeService.subscribeOnline(data.id, (result: any) => {}); 
             navigation.navigate('CampaignsList', {id: data.id});
         }).catch(() => setError('Password or email are incorrect!'));
     }

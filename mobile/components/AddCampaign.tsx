@@ -1,4 +1,4 @@
-import { View, Button, TextInput, StyleSheet, Text, Pressable, Image } from "react-native";
+import { View, TextInput, StyleSheet, Text, Pressable, Image } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
@@ -98,7 +98,7 @@ const myStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     button: {
-        minWidth: '60%',
+        minWidth: '100%',
         minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',

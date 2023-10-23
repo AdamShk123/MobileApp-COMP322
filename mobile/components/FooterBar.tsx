@@ -3,7 +3,7 @@ import appStyles from "../styles";
 import { RootStackParamList, ServiceContext } from '../App';
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import * as i1 from 'react-native-vector-icons/MaterialCommunityIcons';
 import * as i2 from 'react-native-vector-icons/MaterialIcons';
 

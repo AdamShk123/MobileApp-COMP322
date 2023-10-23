@@ -56,7 +56,6 @@ class UserService {
     public async getFriends(id: string): Promise<UserType[]> {
         const initial = this.databaseService.select('friend','player!friend_playerid2_fkey(*)');
         const filtered = this.databaseService.filter(initial, 'playerid1', 'eq', id);
-        // const ordered = this.databaseService.order(filtered, 'plast', true);
 
         const transformed = this.databaseService.await(filtered).then((data) => {
             const rawData : any[] = data['data'];

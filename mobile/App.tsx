@@ -3,7 +3,6 @@ import React, { createContext, useCallback, useState } from 'react';
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
-import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import StartMenu from './components/StartMenu';
 import CreateAccount from './components/CreateAccount';
@@ -47,8 +46,6 @@ export type RootStackParamList = {
 }
 
 const Stack = createDrawerNavigator<RootStackParamList>();
-
-const Tab = createBottomTabNavigator();
 
 const Drawer = (props: DrawerContentComponentProps) => {
     const nav = useCallback((screen: string, args: any = {}) => {
@@ -121,7 +118,6 @@ const myStyles = StyleSheet.create({
         padding: 10,
         borderColor: appStyles.primaryText.color,
         borderRightWidth: 2,
-        justifyContent: 'space-between',
     },
     drawerButton: {
         width: '100%',

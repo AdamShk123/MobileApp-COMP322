@@ -1,10 +1,11 @@
-import { View, StyleSheet, FlatList, Pressable, Text } from "react-native";
+import { View, StyleSheet, FlatList, Pressable, Text, Dimensions } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { UserType } from "../types/User";
+import Icon from 'react-native-vector-icons/Ionicons';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>
 
@@ -50,9 +51,12 @@ const Friends = ({navigation, route}: Props) => {
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Friends'}/>
             <FlatList style={myStyles.componentView} data={list} renderItem={({item}) => <Item user={item.user} online={item.online}/>}/>
-            <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => {navigation.navigate('AddFriend')}}>
-                <Text style={[appStyles.primaryText, appStyles.h6]}>Add Friend</Text>
-            </Pressable>
+            <View style={myStyles.buttonOverlay}>
+                <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddFriend')}>
+                    <Icon name='add-circle' style={[myStyles.buttonSize, appStyles.primaryText]}/>
+                </Pressable>
+            </View>
+
         </View>
     );
 };
@@ -73,17 +77,25 @@ const myStyles = StyleSheet.create({
     button: {
         minWidth: '60%',
         minHeight: 50,
+        marginBottom: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'center'
+    }, 
+    title: {
+        marginTop: 20,
+    },
+    buttonOverlay: {
+        position: 'absolute',
+        top: Dimensions.get("window").height - 100,
+        left: Dimensions.get("window").width - 75,
+    },
+    addButton: {
         alignItems: 'center',
         justifyContent: 'center',
     },
-    input: {
-        minWidth: '100%',
-        marginBottom: 10,
-        borderBottomColor: '#999999',
-        borderBottomWidth: 1,
-    },
-    title: {
-        marginTop: 20,
+    buttonSize: {
+        fontSize: 50,
     }
 });
 

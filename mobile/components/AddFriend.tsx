@@ -83,11 +83,11 @@ const myStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     button: {
-        minWidth: '60%',
+        minWidth: '100%',
         minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',
-        marginBottom: '10%',
+        marginBottom: 10,
     },
     input: {
         minWidth: '100%',

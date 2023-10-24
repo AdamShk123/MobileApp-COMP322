@@ -1,4 +1,4 @@
-import { View, TextInput, StyleSheet, Text, Pressable, Image } from "react-native";
+import { View, TextInput, StyleSheet, Text, Pressable, Image, ScrollView } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
@@ -64,7 +64,7 @@ const AddCampaign = ({navigation}: Props) => {
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Add Campaign'}/>
-            <View style={myStyles.formView}>
+            <ScrollView contentContainerStyle={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={name} style={[myStyles.input, appStyles.primaryText, appStyles.h6]} placeholder='enter campaign name...' onChangeText={(value) => setName(value)}/>
                 <Image style={{width: 100, height: 100}} source={selectedImage ? { uri: selectedImage } : require('../resources/app-icon-2.png')}/>
@@ -74,7 +74,7 @@ const AddCampaign = ({navigation}: Props) => {
                 <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
                     <Text style={[appStyles.h4, disabled ? appStyles.secondaryText : appStyles.primaryText]}>Create Campaign</Text>
                 </Pressable>
-            </View>
+            </ScrollView>
         </View>
     );
 };

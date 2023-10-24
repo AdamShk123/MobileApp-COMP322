@@ -37,13 +37,13 @@ class DatabaseService {
         });
         channel.on('presence', {event: 'sync'}, () => {
             callback(channel.presenceState());
-            console.log('sync');
+            // console.log('sync');
         }).on('presence', {event: 'join'}, ({key, newPresences}) => {
             callback(channel.presenceState());
-            console.log('join');
+            // console.log('join');
         }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
             callback(channel.presenceState());
-            console.log('leave');
+            // console.log('leave');
         });
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){

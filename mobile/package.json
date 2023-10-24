@@ -13,6 +13,7 @@
     "log": "react-native log-android"
   },
   "dependencies": {
+    "@react-native-community/checkbox": "^0.5.16",
     "@react-navigation/drawer": "^6.6.3",
     "@react-navigation/material-top-tabs": "^6.6.4",
     "@react-navigation/native": "^6.1.7",

@@ -5,7 +5,8 @@ import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useEffect, useState, useContext } from "react";
 import { UserType } from "../types/User";
-import { FlatList } from "react-native-gesture-handler";
+import { FlatList } from 'react-native-gesture-handler';
+import CheckBox from '@react-native-community/checkbox';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -16,9 +17,13 @@ type ItemProps = {
 }
 
 const Item = ({user} : ItemProps) => {
+    const [toggle, setToggle] = useState(false);
     return (
-        <View>
+        <View style={myStyles.listItem}>
             <Text style={[appStyles.h6, appStyles.primaryText]}>{user.email}</Text>
+            <CheckBox tintColors={{true: appStyles.primaryText.color, false: appStyles.secondaryText.color}} value={toggle} onValueChange={(value) => {
+                setToggle(value);
+            }}/>
         </View>
     );
 }
@@ -30,7 +35,6 @@ const AddFriend = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
     
     useEffect(() => {
-        console.log(value);
         if(value.length == 1){
             facadeService.searchUsers(value).then((data) => {
                 setList(data);
@@ -58,8 +62,8 @@ const AddFriend = ({navigation}: Props) => {
             <View style={[myStyles.formView]}>
                 <TextInput  value={value} onChangeText={(text) => setValue(text)} placeholderTextColor={appStyles.secondaryText.color} placeholder="enter nickname..." style={[appStyles.primaryBackground, myStyles.input, appStyles.primaryText]}/>
                 <FlatList style={myStyles.listView} data={filterList()} renderItem={({item}) => <Item user={item}/>}/>
-                <Pressable style={[appStyles.secondaryBackground, myStyles.button]}>
-                    <Text style={[appStyles.primaryText, appStyles.h6]}>Add</Text>
+                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => navigation.navigate('Friends', {id: facadeService.getCurrentUser().id})}>
+                    <Text style={[appStyles.primaryText, appStyles.h6]}>Send Friend Invite</Text>
                 </Pressable>
             </View>
         </View>
@@ -73,10 +77,16 @@ const myStyles = StyleSheet.create({
     listView: {
         flex: 1,
     },
+    listItem: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
     formView: {
         flex: 1,
         flexDirection: 'column',
-        maxWidth: '60%',
+        maxWidth: '70%',
         marginLeft: 'auto',
         marginRight: 'auto',
         alignItems: 'center',

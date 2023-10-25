@@ -41,11 +41,8 @@ const Friends = ({navigation, route}: Props) => {
 
     useEffect(() => {
         func([]);    
-    }, [route.params.id]);
-
-    useEffect(() => {
         facadeService.subscribeOnline(facadeService.getCurrentUser().id, func);
-    }, []);
+    }, [route.params.id]);
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>

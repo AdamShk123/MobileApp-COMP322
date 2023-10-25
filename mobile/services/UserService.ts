@@ -79,7 +79,20 @@ class UserService {
             rawData.forEach((item) => {
                 usersList.push({id: item['pid'], email: item['pemail'], nickname: item['pnickname'], first: item['pfirst'], last: item['plast'], created: item['pcreated']});
             });
-            return usersList;
+            const filterFriends = this.getFriends(this.currentUser.id).then((list) => {
+                return usersList.filter((item) => {
+                    let check : boolean = true;
+                    list.forEach((i) => {
+                        if(item.id == i.id || item.id == this.currentUser.id){
+                            check = false;
+                        }
+                    });
+                    if(check){
+                        return item;
+                    }
+                });
+            });
+            return filterFriends;
         });
 
         return transformed;

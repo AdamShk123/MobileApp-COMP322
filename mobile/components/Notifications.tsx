@@ -1,9 +1,9 @@
 import { View, Pressable, FlatList, StyleSheet, Text } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList } from '../App';
+import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -21,6 +21,16 @@ const Item = ({notification} : ItemProps) => {
 
 const Notifications = ({navigation}: Props) => {
     const [list, setList] = useState<string[]>([]);
+
+    const facadeService = useContext(ServiceContext);
+
+    const func = () => {
+        setList([]);
+    };
+
+    useEffect(() => {
+        facadeService.subscribeNotifications(facadeService.getCurrentUser().id, func);
+    }, []);
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>

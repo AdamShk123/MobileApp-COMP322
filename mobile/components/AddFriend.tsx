@@ -14,15 +14,35 @@ type Props = {
 
 type ItemProps = {
     user: UserType;
+    list: UserType[];
+    setList: any;
 }
 
-const Item = ({user} : ItemProps) => {
+const equals = (o1: UserType, o2: UserType) : boolean => {
+        if(o1.id != o2.id){
+            return false;
+        }
+        return true;
+};
+
+const Item = ({user, list, setList} : ItemProps) => {
     const [toggle, setToggle] = useState(false);
+
     return (
         <View style={myStyles.listItem}>
             <Text style={[appStyles.h6, appStyles.primaryText]}>{user.email}</Text>
             <CheckBox tintColors={{true: appStyles.primaryText.color, false: appStyles.secondaryText.color}} value={toggle} onValueChange={(value) => {
                 setToggle(value);
+                const l = list.filter((item) => {
+                    if(!equals(item, user)){
+                        return item;
+                    }
+                });
+                if(value){
+                    l.push(user);
+                }
+                console.log(l);
+                setList(l);
             }}/>
         </View>
     );
@@ -31,29 +51,50 @@ const Item = ({user} : ItemProps) => {
 const AddFriend = ({navigation}: Props) => {
     const [value, setValue] = useState('');
     const [list, setList] = useState<UserType[]>([]);
+    const [chosen, setChosen] = useState<UserType[]>([]);
 
-    const facadeService = useContext(ServiceContext);
+    const facadeService = useContext(ServiceContext);  
     
     useEffect(() => {
+        const filtered = filterList();
+        const l = chosen.filter((item) => {
+            let check : boolean = false;
+            filtered.forEach((i) => {
+                if(equals(i, item)){
+                    check = true;
+                }
+            });
+            if(check){
+                return item;
+            }
+        });
+        setChosen(l);
+
         if(value.length == 1){
             facadeService.searchUsers(value).then((data) => {
                 setList(data);
             });
-        } 
-    }, [value]);
+        }
+     }, [value]);
 
     const filterList = () : UserType[] => {
         if(value.length > 1){
             const nameRegex : RegExp = new RegExp('.*' + value + '.*');
-            const newList : UserType[] = [];
-            list.forEach((item) => {
+            const l = list.filter((item) => {
                 if(nameRegex.test(item.email)){
-                    newList.push(item);
+                    return item;
                 }
             });
-            return newList;
+            return l;
         }
         return list;
+    };
+
+    const sendInvite = () => {
+        console.log('clicked!');
+        console.log(chosen);
+
+        // facadeService.sendInvites();
     };
 
     return (
@@ -61,8 +102,8 @@ const AddFriend = ({navigation}: Props) => {
             <HeaderBar navigation={navigation} headerText={'Add Friends'}/>
             <View style={[myStyles.formView]}>
                 <TextInput  value={value} onChangeText={(text) => setValue(text)} placeholderTextColor={appStyles.secondaryText.color} placeholder="enter nickname..." style={[appStyles.primaryBackground, myStyles.input, appStyles.primaryText]}/>
-                <FlatList style={myStyles.listView} data={filterList()} renderItem={({item}) => <Item user={item}/>}/>
-                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => navigation.navigate('Friends', {id: facadeService.getCurrentUser().id})}>
+                <FlatList style={myStyles.listView} data={filterList()} renderItem={({item}) => <Item user={item} list={chosen} setList={setChosen}/>}/>
+                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={sendInvite}>
                     <Text style={[appStyles.primaryText, appStyles.h6]}>Send Friend Invite</Text>
                 </Pressable>
             </View>

@@ -27,6 +27,18 @@ class DatabaseService {
         });
     }
 
+    public subscribeNotifications(userID: string, callback: () => void) {
+        const channel = this.supabase.channel('campaignsList');
+        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
+            callback();
+        })
+        channel.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                console.log('subscribed to the \'campaignsList\' channel successfully');
+            }
+        });
+    }
+
     public subscribeOnline(userID: string, callback: (presences: any) => void): void {
         const channel = this.supabase.channel('onlineStatus', {
             config: {

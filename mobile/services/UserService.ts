@@ -112,7 +112,7 @@ class UserService {
         const filtered = this.databaseService.filter(initial, 'playerid', 'eq', id);
 
         const transformed = this.databaseService.await(filtered).then((data) => {
-            console.log(data);
+            // console.log(data);
             return data['data'];
         });
 

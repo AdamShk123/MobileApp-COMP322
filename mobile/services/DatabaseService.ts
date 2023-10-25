@@ -22,7 +22,7 @@ class DatabaseService {
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                console.log('subscribed to the \'campaignsList\' channel successfully');
+                // console.log('subscribed to the \'campaignsList\' channel successfully');
             }
         });
     }
@@ -34,7 +34,7 @@ class DatabaseService {
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                console.log('subscribed to the \'campaignsList\' channel successfully');
+                // console.log('subscribed to the \'campaignsList\' channel successfully');
             }
         });
     }
@@ -59,7 +59,7 @@ class DatabaseService {
         });
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                console.log('subscribed to the \'onlineStatus\' channel successfully');
+                // console.log('subscribed to the \'onlineStatus\' channel successfully');
                 channel.track({online: true});
             }
         });

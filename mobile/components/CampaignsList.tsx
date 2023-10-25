@@ -2,12 +2,13 @@ import React, { useContext, useEffect, useState } from 'react'
 import {StyleSheet, Pressable, Text, View, FlatList, ImageBackground, Dimensions} from 'react-native'
 import appStyles from '../styles';         
 import { NativeStackScreenProps, NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import { CampaignType } from '../types/Campaign';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { API_URL } from '@env';
+import FooterBar from './FooterBar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
@@ -34,6 +35,8 @@ const CampaignsList = ({navigation, route}: Props) => {
     const [list, setList] = useState<CampaignType[]>([]);
     const facadeService = useContext(ServiceContext);
 
+    const screen = useContext(ScreenContext);
+    
     const func = () => {
         if(route.params.id) {
             facadeService.getCampaigns(route.params.id).then((data) => setList(data));
@@ -57,6 +60,7 @@ const CampaignsList = ({navigation, route}: Props) => {
                     <Icon name='add-circle' style={[myStyles.buttonSize, appStyles.primaryText]}/>
                 </Pressable>
             </View>
+            <FooterBar current={screen}/>
         </View>
    );
 };

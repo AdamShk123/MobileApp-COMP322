@@ -1,11 +1,12 @@
 import { View, StyleSheet, FlatList, Pressable, Text, Dimensions } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { UserType } from "../types/User";
 import Icon from 'react-native-vector-icons/Ionicons';
+import FooterBar from './FooterBar';
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Friends'>
 
@@ -26,6 +27,7 @@ const Item = ({user, online} : ItemProps) => {
 const Friends = ({navigation, route}: Props) => {
     const [list, setList] = useState<ItemProps[]>([]);
     const facadeService = useContext(ServiceContext);
+    const screen = useContext(ScreenContext);
 
     const func = (result: any) => {
         facadeService.getFriends(route.params.id!).then((data) => {
@@ -53,7 +55,7 @@ const Friends = ({navigation, route}: Props) => {
                     <Icon name='add-circle' style={[myStyles.buttonSize, appStyles.primaryText]}/>
                 </Pressable>
             </View>
-
+            <FooterBar current={screen}/>
         </View>
     );
 };

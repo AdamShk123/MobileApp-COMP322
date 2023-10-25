@@ -69,6 +69,14 @@ class FacadeService {
     public subscribeNotifications(userID: string, callback: () => void){
         this.databaseService.subscribeNotifications(userID, callback);
     }
+
+    public async sendFriendInvites(list: UserType[]): Promise<void> {
+        this.userService.sendFriendInvite(list);
+    }
+
+    public async getInvites() {
+        this.userService.getInvites();
+    }
 }
 
 export default FacadeService;

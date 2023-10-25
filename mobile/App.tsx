@@ -30,6 +30,7 @@ const campaignService = new CampaignService(databaseService);
 const facadeService = new FacadeService(userService, campaignService, databaseService);
 
 export const ServiceContext = createContext(facadeService);
+export const ScreenContext = createContext<string>('');
 
 export type RootStackParamList = {
     StartMenu: undefined,
@@ -90,22 +91,24 @@ const App = () => {
     return (
         <SafeAreaView style={{flex: 1}}>
             <ServiceContext.Provider value={facadeService}>
-                <NavigationContainer ref={navigationRef} onStateChange={() => changed()}>
-                    <Stack.Navigator drawerContent={(props) => Drawer(props)} initialRouteName='StartMenu' backBehavior='history'>
-                        <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
-                        <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
-                        <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>
-                        <Stack.Screen name='Notifications' component={Notifications} options={{headerShown: false}}/>
-                        <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
-                        <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
-                        <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
-                        <Stack.Screen name='AddFriend' component={AddFriend} options={{headerShown: false}}/>
-                    </Stack.Navigator>
-                    <FooterBar current={name}/>
-                </NavigationContainer>
+                <ScreenContext.Provider value={name}>
+                    <NavigationContainer ref={navigationRef} onStateChange={() => changed()}>
+                        <Stack.Navigator drawerContent={(props) => Drawer(props)} initialRouteName='StartMenu' backBehavior='history'>
+                            <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
+                            <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
+                            <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>
+                            <Stack.Screen name='Notifications' component={Notifications} options={{headerShown: false}}/>
+                            <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
+                            <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
+                            <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
+                            <Stack.Screen name='AddFriend' component={AddFriend} options={{headerShown: false}}/>
+                        </Stack.Navigator>
+                        {/* <FooterBar current={name}/> */}
+                    </NavigationContainer>
+                </ScreenContext.Provider>
             </ServiceContext.Provider>
         </SafeAreaView>
     );

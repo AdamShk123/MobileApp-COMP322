@@ -97,6 +97,27 @@ class UserService {
 
         return transformed;
     }
+
+    public async sendFriendInvite(list: UserType[]): Promise<void> {
+        list.forEach((item) => {
+            const initial = this.databaseService.insert('invite', {playerid: item.id, type: 'friend', pid: this.currentUser.id, cid: null});
+            const transformed = this.databaseService.await(initial).then((data) => {
+                console.log(data);    
+            });
+        });
+    }
+
+    public async getInvites(id: string = this.currentUser.id): Promise<any[]> {
+        const initial = this.databaseService.select('invite', '*');
+        const filtered = this.databaseService.filter(initial, 'playerid', 'eq', id);
+
+        const transformed = this.databaseService.await(filtered).then((data) => {
+            console.log(data);
+            return data['data'];
+        });
+
+        return transformed;
+    }
 }
 
 export default UserService;

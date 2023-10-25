@@ -1,10 +1,11 @@
 import { View, TextInput, StyleSheet, Text, Pressable, Image, ScrollView } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker";
+import FooterBar from './FooterBar';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -20,6 +21,7 @@ const AddCampaign = ({navigation}: Props) => {
     const [error, setError] = useState('');
 
     const facadeService = useContext(ServiceContext);
+    const screen = useContext(ScreenContext);
 
     function onButtonPressed(){
         if(!disabled) {
@@ -75,6 +77,7 @@ const AddCampaign = ({navigation}: Props) => {
                     <Text style={[appStyles.h4, disabled ? appStyles.secondaryText : appStyles.primaryText]}>Create Campaign</Text>
                 </Pressable>
             </ScrollView>
+            <FooterBar current={screen}/>
         </View>
     );
 };

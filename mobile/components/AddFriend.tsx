@@ -1,13 +1,13 @@
 import { View, StyleSheet, TextInput, Pressable, Text } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useEffect, useState, useContext } from "react";
 import { UserType } from "../types/User";
 import { FlatList } from 'react-native-gesture-handler';
 import CheckBox from '@react-native-community/checkbox';
-
+import FooterBar from './FooterBar';
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
@@ -54,7 +54,8 @@ const AddFriend = ({navigation}: Props) => {
     const [chosen, setChosen] = useState<UserType[]>([]);
 
     const facadeService = useContext(ServiceContext);  
-    
+    const screen = useContext(ScreenContext);
+
     useEffect(() => {
         const filtered = filterList();
         const l = chosen.filter((item) => {
@@ -91,10 +92,7 @@ const AddFriend = ({navigation}: Props) => {
     };
 
     const sendInvite = () => {
-        console.log('clicked!');
-        console.log(chosen);
-
-        // facadeService.sendInvites();
+        facadeService.sendFriendInvites(chosen);
     };
 
     return (
@@ -104,9 +102,10 @@ const AddFriend = ({navigation}: Props) => {
                 <TextInput  value={value} onChangeText={(text) => setValue(text)} placeholderTextColor={appStyles.secondaryText.color} placeholder="enter nickname..." style={[appStyles.primaryBackground, myStyles.input, appStyles.primaryText]}/>
                 <FlatList style={myStyles.listView} data={filterList()} renderItem={({item}) => <Item user={item} list={chosen} setList={setChosen}/>}/>
                 <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={sendInvite}>
-                    <Text style={[appStyles.primaryText, appStyles.h6]}>Send Friend Invite</Text>
+                    <Text style={[chosen.length > 0 ? appStyles.primaryText : appStyles.secondaryText, appStyles.h6]}>Send Friend Invite</Text>
                 </Pressable>
             </View>
+            <FooterBar current={screen}/>
         </View>
     );
 };

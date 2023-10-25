@@ -1,20 +1,21 @@
 import { StyleSheet, View, Button, Text, Image } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from 'react';
 import { CampaignType } from "../types/Campaign";
 import { API_URL } from '@env'
-type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
+import FooterBar from './FooterBar';
 
+type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
 
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
-
+    const screen = useContext(ScreenContext);
     useEffect(() => {
         if(route.params.id){
             setID(route.params.id);
@@ -44,6 +45,7 @@ const Campaign = ({navigation, route}: Props) => {
             <View style={myStyles.tabsView}>
                 <Button title='tabs'/>
             </View>
+            <FooterBar current={screen}/>
         </View>
     );
 };

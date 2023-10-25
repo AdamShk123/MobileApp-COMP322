@@ -16,6 +16,15 @@ const Campaign = ({navigation, route}: Props) => {
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
 
+    const [mapVisible, setMapVisible] = useState('block');
+    const [tabsVisible, setTabsVisible] = useState('block');
+    const baseScale = useRef(new Animated.Value(1)).current;
+    const pinchScale = useRef(new Animated.Value(1)).current;
+    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
+    const translateX = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(0)).current;
+    let prevValues = {x: 0, y: 0, scale: 1};
+
     useEffect(() => {
         if(route.params.id){
             setID(route.params.id);
@@ -35,13 +44,6 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
-    const baseScale = useRef(new Animated.Value(1)).current;
-    const pinchScale = useRef(new Animated.Value(1)).current;
-    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
-    const translateX = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(0)).current;
-    let prevValues = {x: 0, y: 0, scale: 1};
-
     const MapPinchHandler = Animated.event([{
         nativeEvent: {
             scale: pinchScale
@@ -55,6 +57,10 @@ const Campaign = ({navigation, route}: Props) => {
             prevValues.scale *= nativeEvent.scale;
             baseScale.setValue(prevValues.scale);
             pinchScale.setValue(1);
+            console.log(baseScale)
+            if (baseScale < 1) {
+                baseScale.setValue(1);
+            }
         }
     };
 
@@ -66,6 +72,7 @@ const Campaign = ({navigation, route}: Props) => {
             translateX.setValue(0);
             translateY.setOffset(prevValues.y);
             translateY.setValue(0);
+            console.log(translateX, translateY)
         }
     };
 
@@ -84,8 +91,21 @@ const Campaign = ({navigation, route}: Props) => {
     return (
         <View style={myStyles.componentView}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <Button title='map'/>
-            <Animated.View style={myStyles.mapView}>
+            <Button
+                title='map'
+                onPress={() => {
+                    if (mapVisible === 'none') {
+                        setMapVisible('block');
+                    } else {
+                        setMapVisible('none');
+                    }
+                    console.log('Map Toggled')
+                }}
+            />
+            <Animated.View
+                style={myStyles.mapView}
+                display={mapVisible}
+            >
                 <PanGestureHandler
                     onGestureEvent={MapPanHandler}
                     onHandlerStateChange={panStateChanged}
@@ -118,8 +138,21 @@ const Campaign = ({navigation, route}: Props) => {
                     </Animated.View>
                 </PanGestureHandler>
             </Animated.View>
-            <View style={myStyles.tabsView}>
-                <Button title='tabs'/>
+            <Button
+                title='tabs'
+                onPress={() => {
+                    if (tabsVisible === 'none') {
+                        setTabsVisible('block');
+                    } else {
+                        setTabsVisible('none');
+                    }
+                    console.log('Tabs Toggled')
+                }}
+            />
+            <View
+                style={myStyles.tabsView}
+                display={tabsVisible}
+            >
             </View>
         </View>
     );

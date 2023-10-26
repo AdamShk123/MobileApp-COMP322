@@ -57,12 +57,22 @@ const Campaign = ({navigation, route}: Props) => {
             useNativeDriver: true
         });
 
+    const minZoom = 0.25;
+    const maxZoom = 4;
+
     const pinchStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
             prevValues.scale *= nativeEvent.scale;
             baseScale.setValue(prevValues.scale);
             pinchScale.setValue(1);
-            console.log(baseScale)
+            if (baseScale.__getValue() > maxZoom) {
+                baseScale.setValue(maxZoom);
+                prevValues.scale = maxZoom;
+            } else if (baseScale.__getValue() < minZoom) {
+                baseScale.setValue(minZoom);
+                prevValues.scale = minZoom;
+            }
+            console.log(baseScale);
         }
     };
 

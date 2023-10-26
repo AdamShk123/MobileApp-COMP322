@@ -33,6 +33,11 @@ const Campaign = ({navigation, route}: Props) => {
                 facadeService.updateCampaignPlayedData(data.id);
             });
         }
+        translateX.setOffset(prevValues.x);
+        translateX.setValue(0);
+        translateY.setOffset(prevValues.y);
+        translateY.setValue(0);
+        baseScale.setValue(1);
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -58,9 +63,6 @@ const Campaign = ({navigation, route}: Props) => {
             baseScale.setValue(prevValues.scale);
             pinchScale.setValue(1);
             console.log(baseScale)
-            if (baseScale < 1) {
-                baseScale.setValue(1);
-            }
         }
     };
 

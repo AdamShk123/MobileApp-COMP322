@@ -78,13 +78,13 @@ const Campaign = ({navigation, route}: Props) => {
 
     const panStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
-            prevValues.x += nativeEvent.translationX;
-            prevValues.y += nativeEvent.translationY;
+            prevValues.x += nativeEvent.translationX / baseScale.__getValue();
+            prevValues.y += nativeEvent.translationY / baseScale.__getValue();
             translateX.setOffset(prevValues.x);
             translateX.setValue(0);
             translateY.setOffset(prevValues.y);
             translateY.setValue(0);
-            console.log(translateX, translateY)
+            console.log(translateX.__getValue() * baseScale.__getValue(), translateY.__getValue() * baseScale.__getValue())
         }
     };
 

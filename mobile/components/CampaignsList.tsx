@@ -1,13 +1,15 @@
 import React, { useContext, useEffect, useState } from 'react'
-import {StyleSheet, Pressable, Text, View, FlatList, ScrollView, ImageBackground} from 'react-native'
+import {StyleSheet, Pressable, Text, View, FlatList, ImageBackground, Dimensions} from 'react-native'
 import appStyles from '../styles';         
 import { NativeStackScreenProps, NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import HeaderBar from './HeaderBar';
 import { useNavigation } from '@react-navigation/native';
 import { CampaignType } from '../types/Campaign';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { API_URL } from '@env';
+import FooterBar from './FooterBar';
+
 type Props = NativeStackScreenProps<RootStackParamList, 'CampaignsList'>
 
 type Campaign = {
@@ -33,11 +35,21 @@ const CampaignsList = ({navigation, route}: Props) => {
     const [list, setList] = useState<CampaignType[]>([]);
     const facadeService = useContext(ServiceContext);
 
-    useEffect(() => {
-        if(route.params.id){
+    const screen = useContext(ScreenContext);
+    
+    const func = () => {
+        if(route.params.id) {
             facadeService.getCampaigns(route.params.id).then((data) => setList(data));
         }
-    }, [route.params])
+    };
+
+    useEffect(() => {
+       func(); 
+    }, [route.params.id])
+
+    useEffect(() => {
+        facadeService.subscribeCampaigns(func);
+    }, []);
     
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>
@@ -45,9 +57,10 @@ const CampaignsList = ({navigation, route}: Props) => {
             <FlatList style={myStyles.listView} data={list} renderItem={({item}) => <Item campaignName={item.name} campaignID={item.id}/>}/>
             <View style={myStyles.buttonOverlay}>
                 <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddCampaign')}>
-                    <Icon name='add-circle' style={[appStyles.h1, appStyles.primaryText]}/>
+                    <Icon name='add-circle' style={[myStyles.buttonSize, appStyles.primaryText]}/>
                 </Pressable>
             </View>
+            <FooterBar current={screen}/>
         </View>
    );
 };
@@ -68,8 +81,8 @@ const myStyles = StyleSheet.create({
     },
     buttonOverlay: {
         position: 'absolute',
-        top: 75,
-        left: 20,
+        top: Dimensions.get("window").height - 175,
+        left: Dimensions.get("window").width - 75,
     },
     image: {
         width: 1000,
@@ -96,6 +109,9 @@ const myStyles = StyleSheet.create({
     addButton: {
         alignItems: 'center',
         justifyContent: 'center',
+    },
+    buttonSize: {
+        fontSize: 50,
     }
 });
 

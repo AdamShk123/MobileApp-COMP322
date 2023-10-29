@@ -1,4 +1,3 @@
-import { PostgrestSingleResponse, SupabaseClient } from "@supabase/supabase-js";
 import UserService from "./UserService";
 import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
@@ -15,6 +14,11 @@ class FacadeService {
 
     public async logIn(email: string, password: string): Promise<UserType> {
         const data = this.userService.logIn(email, password);
+        return data;
+    }
+
+    public async logOut() {
+        const data = this.databaseService.logOut();
         return data;
     }
 
@@ -42,8 +46,36 @@ class FacadeService {
         return this.campaignService.createCampaign(row);
     }
 
+    public async getFriends(id: string): Promise<UserType[]> {
+        return this.userService.getFriends(id);
+    }
+
     public uploadImage(bucket: string, id: string, uri: string): Promise<CampaignType> {
         return this.databaseService.uploadImage(bucket, id, uri);
+    }
+
+    public async searchUsers(searchText: string): Promise<UserType[]> {
+        return this.userService.searchUsers(searchText);
+    }
+
+    public subscribeCampaigns(callback: () => void): void {
+        this.databaseService.subscribeCampaigns(callback);
+    }
+
+    public subscribeOnline(userID: string, callback: (presences: any) => void): void {
+        this.databaseService.subscribeOnline(userID, callback);
+    }
+
+    public subscribeNotifications(userID: string, callback: () => void){
+        this.databaseService.subscribeNotifications(userID, callback);
+    }
+
+    public async sendFriendInvites(list: UserType[]): Promise<void> {
+        this.userService.sendFriendInvite(list);
+    }
+
+    public async getInvites() {
+        this.userService.getInvites();
     }
 }
 

@@ -1,8 +1,9 @@
 import React, { useContext, useEffect, useState } from 'react';
-import { StyleSheet, View, Button, TextInput, Text, Alert, Pressable } from 'react-native';
+import { StyleSheet, View, ScrollView, TextInput, Text, Alert, Pressable } from 'react-native';
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext } from '../App';
 import appStyles from '../styles';
+import HeaderBar from './HeaderBar';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -50,18 +51,17 @@ const CreateAccount = ({navigation}: Props) => {
 
     return (
         <View style={[appStyles.primaryBackground,myStyles.componentView]}>
-            <Text style={[appStyles.h1, appStyles.primaryText, myStyles.title]}>Create Account</Text>
-            {/* <Text style={myStyles.requirementsText}>Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character</Text> */}
-            <View style={myStyles.formView}>
+            <HeaderBar navigation={navigation} headerText={'Create Account'}/>
+            <ScrollView contentContainerStyle={myStyles.formView}>
+                <Text style={myStyles.requirementsText}>Password has to be at least 8 characters long, have one uppercase, one lowercase, one number, and one special character</Text>
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.email} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='enter email...' onChangeText={(value) => setForm({email: value, password: form.password, confirm: form.confirm})}/>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.password} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='enter password...' onChangeText={(value) => setForm({email: form.email, password: value, confirm: form.confirm})}/>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={form.confirm} style={[myStyles.input, appStyles.h6, appStyles.primaryText]} placeholder='confirm password' onChangeText={(value) => setForm({email: form.email, password: form.password, confirm: value})}/>
-                {/* <Button disabled={disabled} title='Create Account' onPress={() => onButtonPressed()}/> */}
-            </View>
-            <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
-                <Text style={[appStyles.h4, {color: disabled ? appStyles.secondaryText.color : appStyles.primaryText.color}]}>Create Account</Text>
-            </Pressable>
+                <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
+                    <Text style={[appStyles.h4, {color: disabled ? appStyles.secondaryText.color : appStyles.primaryText.color}]}>Create Account</Text>
+                </Pressable>
+            </ScrollView>
         </View>
     );
 };
@@ -69,12 +69,11 @@ const CreateAccount = ({navigation}: Props) => {
 const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
-        alignItems: 'center',
+        alignItems: 'center'
     },
     formView: {
         flex: 1,
         flexDirection: 'column',
-        maxWidth: '60%',
         marginLeft: 'auto',
         marginRight: 'auto',
         alignItems: 'center',
@@ -84,21 +83,26 @@ const myStyles = StyleSheet.create({
         color: 'white',
         fontWeight: 'normal',
         fontSize: 16,
+        marginBottom: 20,
+        maxWidth: '60%'
     },
     warningText: {
         color: 'red',
         fontWeight: 'bold',
         fontSize: 16,
+        maxWidth: '60%',
+        marginBottom: 20
     },
     button: {
         minWidth: '60%',
         minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',
+        marginTop: 20,
         marginBottom: '10%',
     },
     input: {
-        minWidth: '100%',
+        minWidth: '60%',
         marginBottom: 10,
         borderBottomColor: '#999999',
         borderBottomWidth: 1,

@@ -1,21 +1,25 @@
 import { StyleSheet, View, Button, Text, Image, Animated } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState, useRef, createRef } from 'react';
 import { CampaignType } from "../types/Campaign";
+
 import { API_URL } from '@env';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
+import FooterBar from './FooterBar';
 
+
+type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
 
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
-
+    const screen = useContext(ScreenContext);
     const [mapVisible, setMapVisible] = useState('block');
     const [tabsVisible, setTabsVisible] = useState('block');
     const baseScale = useRef(new Animated.Value(1)).current;
@@ -44,7 +48,8 @@ const Campaign = ({navigation, route}: Props) => {
         return (
             <View style={[myStyles.componentView, appStyles.primaryBackground]}>
                 <HeaderBar navigation={navigation} headerText={'Campaign'}/>
-                <Text style={[appStyles.primaryText, appStyles.h6]}>You have to choose one of the campaigns on the campaigns list screen first!</Text>
+                <Text style={[appStyles.primaryText, appStyles.h6, {flex: 1}]}>You have to choose one of the campaigns on the campaigns list screen first!</Text>
+                <FooterBar current={screen}/>
             </View>
         );
     }
@@ -166,6 +171,7 @@ const Campaign = ({navigation, route}: Props) => {
                 display={tabsVisible}
             >
             </View>
+            <FooterBar current={screen}/>
         </View>
     );
 };

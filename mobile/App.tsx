@@ -1,5 +1,5 @@
 import 'react-native-gesture-handler';
-import React, { createContext, useCallback, useRef, useState } from 'react';
+import React, { createContext, useCallback, useState } from 'react';
 import { SafeAreaView, View, Text, Pressable, StyleSheet } from 'react-native';
 import { NavigationContainer, useNavigationContainerRef } from '@react-navigation/native';
 import { createDrawerNavigator, DrawerContentComponentProps } from '@react-navigation/drawer';
@@ -13,6 +13,7 @@ import Notifications from './components/Notifications';
 import Settings from './components/Settings';
 import Profile from './components/Profile';
 import AddCampaign from './components/AddCampaign';
+import AddFriend from './components/AddFriend';
 import Campaign from './components/Campaign';
 import FooterBar from './components/FooterBar';
 
@@ -29,6 +30,7 @@ const campaignService = new CampaignService(databaseService);
 const facadeService = new FacadeService(userService, campaignService, databaseService);
 
 export const ServiceContext = createContext(facadeService);
+export const ScreenContext = createContext<string>('');
 
 export type RootStackParamList = {
     StartMenu: undefined,
@@ -36,18 +38,19 @@ export type RootStackParamList = {
     CampaignsList: {id?: string},
     Campaign: {id?: string},
     LogIn: undefined,
-    Friends: undefined,
+    Friends: {id?: string},
     Settings: undefined,
     Notifications: undefined,
     Profile: undefined,
     AddCampaign: undefined,
+    AddFriend: undefined,
 }
 
 const Stack = createDrawerNavigator<RootStackParamList>();
 
-const Drawer = (props: DrawerContentComponentProps) => { 
-    const nav = useCallback((screen: string) => {
-        props.navigation.navigate(screen, {});
+const Drawer = (props: DrawerContentComponentProps) => {
+    const nav = useCallback((screen: string, args: any = {}) => {
+        props.navigation.navigate(screen, args);
     }, [props]);
 
     return (
@@ -58,7 +61,7 @@ const Drawer = (props: DrawerContentComponentProps) => {
             <Pressable style={myStyles.drawerButton} onPress={() => nav('CampaignsList')}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Campaigns List</Text>
             </Pressable>
-            <Pressable style={myStyles.drawerButton} onPress={() => nav('Friends')}>
+            <Pressable style={myStyles.drawerButton} onPress={() => nav('Friends', {id: facadeService.getCurrentUser().id})}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Friends</Text>
             </Pressable>
             <Pressable style={myStyles.drawerButton} onPress={() => nav('Notifications')}>
@@ -67,7 +70,7 @@ const Drawer = (props: DrawerContentComponentProps) => {
             <Pressable style={myStyles.drawerButton} onPress={() => nav('Settings')}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Settings</Text>
             </Pressable>
-            <Pressable style={myStyles.drawerButton} onPress={() => nav('StartMenu')}>
+            <Pressable style={myStyles.drawerButton} onPress={() => {facadeService.logOut(); nav('StartMenu');}}>
                 <Text style={[appStyles.primaryText, appStyles.h4]}>Sign Out</Text>
             </Pressable>
         </View>
@@ -88,21 +91,24 @@ const App = () => {
     return (
         <SafeAreaView style={{flex: 1}}>
             <ServiceContext.Provider value={facadeService}>
-                <NavigationContainer ref={navigationRef} onStateChange={() => changed()}>
-                    <Stack.Navigator drawerContent={(props) => Drawer(props)} initialRouteName='StartMenu' backBehavior='history'>
-                        <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
-                        <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
-                        <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
-                        <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>
-                        <Stack.Screen name='Notifications' component={Notifications} options={{headerShown: false}}/>
-                        <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
-                        <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
-                        <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
-                    </Stack.Navigator>
-                    <FooterBar current={name}/>
-                </NavigationContainer>
+                <ScreenContext.Provider value={name}>
+                    <NavigationContainer ref={navigationRef} onStateChange={() => changed()}>
+                        <Stack.Navigator drawerContent={(props) => Drawer(props)} initialRouteName='StartMenu' backBehavior='history'>
+                            <Stack.Screen name='StartMenu' component={StartMenu} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='CreateAccount' component={CreateAccount} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='LogIn' component={LogIn} options={{headerShown: false, swipeEnabled: false}}/>
+                            <Stack.Screen name='CampaignsList' component={CampaignsList} options={{headerShown: false}}/>
+                            <Stack.Screen name='Campaign' component={Campaign} options={{headerShown: false}}/>
+                            <Stack.Screen name='Friends' component={Friends} options={{headerShown: false}}/>
+                            <Stack.Screen name='Notifications' component={Notifications} options={{headerShown: false}}/>
+                            <Stack.Screen name='Settings' component={Settings} options={{headerShown: false}}/>
+                            <Stack.Screen name='Profile' component={Profile} options={{headerShown: false}}/>
+                            <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
+                            <Stack.Screen name='AddFriend' component={AddFriend} options={{headerShown: false}}/>
+                        </Stack.Navigator>
+                        {/* <FooterBar current={name}/> */}
+                    </NavigationContainer>
+                </ScreenContext.Provider>
             </ServiceContext.Provider>
         </SafeAreaView>
     );

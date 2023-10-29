@@ -13,7 +13,56 @@ class DatabaseService {
         this.url = API_URL;
         this.key = API_KEY;
         this.supabase = createClient(this.url, this.key);
-        // this.supabase.storage.from('campaigns').upload('21/main.png','');
+    }
+
+    public subscribeCampaigns(callback: () => void): void {
+        const channel = this.supabase.channel('campaignsList');
+        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
+            callback();
+        })
+        channel.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                // console.log('subscribed to the \'campaignsList\' channel successfully');
+            }
+        });
+    }
+
+    public subscribeNotifications(userID: string, callback: () => void) {
+        const channel = this.supabase.channel('campaignsList');
+        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
+            callback();
+        })
+        channel.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                // console.log('subscribed to the \'campaignsList\' channel successfully');
+            }
+        });
+    }
+
+    public subscribeOnline(userID: string, callback: (presences: any) => void): void {
+        const channel = this.supabase.channel('onlineStatus', {
+            config: {
+                presence: {
+                    key: userID
+                }
+            }
+        });
+        channel.on('presence', {event: 'sync'}, () => {
+            callback(channel.presenceState());
+            // console.log('sync');
+        }).on('presence', {event: 'join'}, ({key, newPresences}) => {
+            callback(channel.presenceState());
+            // console.log('join');
+        }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
+            callback(channel.presenceState());
+            // console.log('leave');
+        });
+        channel.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                // console.log('subscribed to the \'onlineStatus\' channel successfully');
+                channel.track({online: true});
+            }
+        });
     }
 
     public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {
@@ -105,7 +154,14 @@ class DatabaseService {
     public async logIn(email: string, password: string): Promise<any> {
         const data = await this.supabase.auth.signInWithPassword({email, password});
         return data;
-    } 
+    }
+
+    public async logOut() {
+        const promise = await this.supabase.auth.signOut().then(() => {
+            return this.supabase.removeAllChannels();
+        });
+        return promise;
+    }
 }
 
 export default DatabaseService;

@@ -1,10 +1,11 @@
-import { View, Button, TextInput, StyleSheet, Text, Pressable, Image } from "react-native";
+import { View, TextInput, StyleSheet, Text, Pressable, Image, ScrollView } from "react-native";
 import {NativeStackNavigationProp} from '@react-navigation/native-stack';
-import { RootStackParamList, ServiceContext } from '../App';
+import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker";
+import FooterBar from './FooterBar';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -20,6 +21,7 @@ const AddCampaign = ({navigation}: Props) => {
     const [error, setError] = useState('');
 
     const facadeService = useContext(ServiceContext);
+    const screen = useContext(ScreenContext);
 
     function onButtonPressed(){
         if(!disabled) {
@@ -64,7 +66,7 @@ const AddCampaign = ({navigation}: Props) => {
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Add Campaign'}/>
-            <View style={myStyles.formView}>
+            <ScrollView contentContainerStyle={myStyles.formView}>
                 <Text style={myStyles.warningText}>{error}</Text>
                 <TextInput placeholderTextColor={appStyles.secondaryText.color} value={name} style={[myStyles.input, appStyles.primaryText, appStyles.h6]} placeholder='enter campaign name...' onChangeText={(value) => setName(value)}/>
                 <Image style={{width: 100, height: 100}} source={selectedImage ? { uri: selectedImage } : require('../resources/app-icon-2.png')}/>
@@ -74,7 +76,8 @@ const AddCampaign = ({navigation}: Props) => {
                 <Pressable style={[appStyles.secondaryBackground, myStyles.button]} onPress={() => onButtonPressed()}>
                     <Text style={[appStyles.h4, disabled ? appStyles.secondaryText : appStyles.primaryText]}>Create Campaign</Text>
                 </Pressable>
-            </View>
+            </ScrollView>
+            <FooterBar current={screen}/>
         </View>
     );
 };
@@ -98,7 +101,7 @@ const myStyles = StyleSheet.create({
         fontWeight: 'bold',
     },
     button: {
-        minWidth: '60%',
+        minWidth: '100%',
         minHeight: 50,
         alignItems: 'center',
         justifyContent: 'center',

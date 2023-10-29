@@ -30,7 +30,8 @@ const Campaign = ({navigation, route}: Props) => {
         return (
             <View style={[myStyles.componentView, appStyles.primaryBackground]}>
                 <HeaderBar navigation={navigation} headerText={'Campaign'}/>
-                <Text style={[appStyles.primaryText, appStyles.h6]}>You have to choose one of the campaigns on the campaigns list screen first!</Text>
+                <Text style={[appStyles.primaryText, appStyles.h6, {flex: 1}]}>You have to choose one of the campaigns on the campaigns list screen first!</Text>
+                <FooterBar current={screen}/>
             </View>
         );
     }

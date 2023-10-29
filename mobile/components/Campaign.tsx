@@ -11,10 +11,6 @@ import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gest
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
 
-
-type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
-
-
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');

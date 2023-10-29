@@ -1,12 +1,16 @@
-import { StyleSheet, View, Button, Text, Image } from "react-native";
+import { StyleSheet, View, Button, Text, Image, Animated } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
-import { useContext, useEffect, useState } from 'react';
+import { useContext, useEffect, useState, useRef, createRef } from 'react';
 import { CampaignType } from "../types/Campaign";
-import { API_URL } from '@env'
+
+import { API_URL } from '@env';
+import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
+type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
+
 
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
@@ -16,6 +20,15 @@ const Campaign = ({navigation, route}: Props) => {
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
+    const [mapVisible, setMapVisible] = useState('block');
+    const [tabsVisible, setTabsVisible] = useState('block');
+    const baseScale = useRef(new Animated.Value(1)).current;
+    const pinchScale = useRef(new Animated.Value(1)).current;
+    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
+    const translateX = useRef(new Animated.Value(0)).current;
+    const translateY = useRef(new Animated.Value(0)).current;
+    let prevValues = {x: 0, y: 0, scale: 1};
+
     useEffect(() => {
         if(route.params.id){
             setID(route.params.id);
@@ -24,6 +37,11 @@ const Campaign = ({navigation, route}: Props) => {
                 facadeService.updateCampaignPlayedData(data.id);
             });
         }
+        translateX.setOffset(prevValues.x);
+        translateX.setValue(0);
+        translateY.setOffset(prevValues.y);
+        translateY.setValue(0);
+        baseScale.setValue(1);
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -36,15 +54,122 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
+    const MapPinchHandler = Animated.event([{
+        nativeEvent: {
+            scale: pinchScale
+        }}],
+        {
+            useNativeDriver: true
+        });
+
+    const minZoom = 0.25;
+    const maxZoom = 4;
+
+    const pinchStateChanged = ({nativeEvent}) => {
+        if (nativeEvent.oldState === State.ACTIVE) {
+            prevValues.scale *= nativeEvent.scale;
+            baseScale.setValue(prevValues.scale);
+            pinchScale.setValue(1);
+            if (baseScale.__getValue() > maxZoom) {
+                baseScale.setValue(maxZoom);
+                prevValues.scale = maxZoom;
+            } else if (baseScale.__getValue() < minZoom) {
+                baseScale.setValue(minZoom);
+                prevValues.scale = minZoom;
+            }
+            console.log(baseScale);
+        }
+    };
+
+    const panStateChanged = ({nativeEvent}) => {
+        if (nativeEvent.oldState === State.ACTIVE) {
+            prevValues.x += nativeEvent.translationX;
+            prevValues.y += nativeEvent.translationY;
+            translateX.setOffset(prevValues.x);
+            translateX.setValue(0);
+            translateY.setOffset(prevValues.y);
+            translateY.setValue(0);
+            console.log(translateX.__getValue(), translateY.__getValue())
+        }
+    };
+
+    const MapPanHandler = Animated.event([{
+        nativeEvent: {
+            translationX: translateX,
+            translationY: translateY
+        }}],
+        {
+            useNativeDriver: true
+        });
+
+    const pinchRef = createRef()
+    const panRef = createRef()
+
     return (
         <View style={myStyles.componentView}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <View style={myStyles.mapView}>
-                <Button title='map'/>
-                <Image style={{width: '100%', height: '100%'}} source={{uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'}}/>
-            </View>
-            <View style={myStyles.tabsView}>
-                <Button title='tabs'/>
+            <Button
+                title='map'
+                onPress={() => {
+                    if (mapVisible === 'none') {
+                        setMapVisible('block');
+                    } else {
+                        setMapVisible('none');
+                    }
+                    console.log('Map Toggled')
+                }}
+            />
+            <Animated.View
+                style={myStyles.mapView}
+                display={mapVisible}
+            >
+                <PanGestureHandler
+                    onGestureEvent={MapPanHandler}
+                    onHandlerStateChange={panStateChanged}
+                    ref={panRef}
+                    simultaneousHandlers={[pinchRef]}
+                    shouldCancelWhenOutside
+                >
+                    <Animated.View>
+                        <PinchGestureHandler
+                            onGestureEvent={MapPinchHandler}
+                            onHandlerStateChange={pinchStateChanged}
+                            ref={pinchRef}
+                            simultaneousHandlers={[panRef]}
+                        >
+                            <Animated.Image
+                                style={{
+                                    width: '100%',
+                                    height: '100%',
+                                    transform: [
+                                        {translateX},
+                                        {translateY},
+                                        {scale}
+                                    ]
+                                }}
+                                source={{
+                                    uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
+                                }}
+                            />
+                        </PinchGestureHandler>
+                    </Animated.View>
+                </PanGestureHandler>
+            </Animated.View>
+            <Button
+                title='tabs'
+                onPress={() => {
+                    if (tabsVisible === 'none') {
+                        setTabsVisible('block');
+                    } else {
+                        setTabsVisible('none');
+                    }
+                    console.log('Tabs Toggled')
+                }}
+            />
+            <View
+                style={myStyles.tabsView}
+                display={tabsVisible}
+            >
             </View>
             <FooterBar current={screen}/>
         </View>
@@ -54,10 +179,11 @@ const Campaign = ({navigation, route}: Props) => {
 const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
-        flexDirection: 'column'
+        flexDirection: 'column',
     },
     mapView: {
         flex: 1,
+        zIndex: -1,
     },
     tabsView: {
         flex: 1,

@@ -174,16 +174,13 @@ const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
         flexDirection: 'column',
-        backgroundColor: '#606060',
     },
     mapView: {
         flex: 1,
         zIndex: -1,
-        backgroundColor: '#606060',
     },
     tabsView: {
         flex: 1,
-        backgroundColor: '#606060',
     }
 })
 

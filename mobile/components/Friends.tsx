@@ -52,6 +52,7 @@ const Friends = ({navigation, route}: Props) => {
             <FlatList style={myStyles.componentView} data={list} renderItem={({item}) => <Item user={item.user} online={item.online}/>}/>
             <View style={myStyles.buttonOverlay}>
                 <Pressable style={[myStyles.addButton]} onPress={() => navigation.navigate('AddFriend')}>
+                    <Text>Hello</Text>
                     <Icon name='add-circle' style={[myStyles.buttonSize, appStyles.primaryText]}/>
                 </Pressable>
             </View>
@@ -86,7 +87,7 @@ const myStyles = StyleSheet.create({
     },
     buttonOverlay: {
         position: 'absolute',
-        top: Dimensions.get("window").height - 100,
+        top: Dimensions.get("window").height - 175,
         left: Dimensions.get("window").width - 75,
     },
     addButton: {

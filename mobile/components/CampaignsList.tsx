@@ -81,7 +81,7 @@ const myStyles = StyleSheet.create({
     },
     buttonOverlay: {
         position: 'absolute',
-        top: Dimensions.get("window").height - 100,
+        top: Dimensions.get("window").height - 175,
         left: Dimensions.get("window").width - 75,
     },
     image: {

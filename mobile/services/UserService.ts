@@ -1,5 +1,6 @@
 import DatabaseService from "./DatabaseService";
 import {UserType} from "../types/User";
+import {InviteType} from "../types/Invite";
 
 class UserService {
     private _currentUser?: UserType;
@@ -107,13 +108,21 @@ class UserService {
         });
     }
 
-    public async getInvites(id: string = this.currentUser.id): Promise<any[]> {
+    public async getInvites(id: string = this.currentUser.id): Promise<InviteType[]> {
         const initial = this.databaseService.select('invite', '*');
         const filtered = this.databaseService.filter(initial, 'playerid', 'eq', id);
 
         const transformed = this.databaseService.await(filtered).then((data) => {
-            // console.log(data);
-            return data['data'];
+            console.log(data);
+            const rawData = data['data'];
+            const formatted : InviteType[] = [];
+            rawData.forEach((item : any) => {
+                this.getUser(item['pid']).then((value) => {
+                    formatted.push({playerid: item['playerid'], pid: item['pid'], cid: item['cid'], date: item['date'], type: item['type'], pobject: value});
+                    console.log(formatted);
+                })
+            });
+            return formatted;
         });
 
         return transformed;

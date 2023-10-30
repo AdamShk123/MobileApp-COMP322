@@ -26,8 +26,6 @@ const Campaign = ({navigation, route}: Props) => {
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
-    const [mapVisible, setMapVisible] = useState('block');
-    const [tabsVisible, setTabsVisible] = useState('block');
     const baseScale = useRef(new Animated.Value(1)).current;
     const pinchScale = useRef(new Animated.Value(1)).current;
     const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
@@ -116,7 +114,6 @@ const Campaign = ({navigation, route}: Props) => {
             <HeaderBar navigation={navigation} headerText={data.name}/> 
             <Animated.View
                 style={myStyles.mapView}
-                display={mapVisible}
             >
                 <PanGestureHandler
                     onGestureEvent={MapPanHandler}
@@ -151,10 +148,12 @@ const Campaign = ({navigation, route}: Props) => {
                 </PanGestureHandler>
             </Animated.View>
             <View style={myStyles.tabsView}>
-                <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
-                    <Tab.Screen name='Dice' component={DiceTab}/>
-                    <Tab.Screen name='Chat' component={ChatTab}/>
-                </Tab.Navigator>
+                <NavigationContainer independent={true}>
+                    <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
+                        <Tab.Screen name='Dice' component={DiceTab}/>
+                        <Tab.Screen name='Chat' component={ChatTab}/>
+                    </Tab.Navigator>
+                </NavigationContainer>
             </View>
             <FooterBar current={screen}/>
         </View>

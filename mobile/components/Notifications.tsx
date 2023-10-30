@@ -5,39 +5,66 @@ import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import FooterBar from './FooterBar';
+import { InviteType } from "../types/Invite";
+import FacadeService from "../services/FacadeService";
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
 type ItemProps = {
-    notification: string
+    notification: InviteType,
+    facadeService: FacadeService,
 }
 
-const Item = ({notification} : ItemProps) => {
+const Item = ({notification, facadeService} : ItemProps) => {
+
+    const decline = () => {
+        console.log('declined!');
+        // delete notification
+    };
+
+    const accept = () => {
+        console.log('accepted');
+        // delete notification
+        // add friend
+    };
+
     return (
-        <View>{notification}</View>
+        <View style={[myStyles.itemView, appStyles.secondaryBackground]}>
+            <Text style={[appStyles.primaryText, appStyles.h6]}>Invite From: {notification.pobject!.email}</Text>
+            <View style={myStyles.buttonsView}>
+                <Pressable style={[appStyles.primaryBackground, myStyles.itemButton]} onPress={accept}>
+                    <Text style={[appStyles.primaryText, appStyles.h6]}>Accept</Text>
+                </Pressable>
+                <Pressable style={[appStyles.primaryBackground, myStyles.itemButton]} onPress={decline}>
+                    <Text style={[appStyles.primaryText, appStyles.h6]}>Decline</Text>
+                </Pressable>
+            </View>
+        </View>
     ); 
 };
 
 const Notifications = ({navigation}: Props) => {
-    const [list, setList] = useState<string[]>([]);
+    const [list, setList] = useState<InviteType[]>([]);
 
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
     const func = () => {
-        setList([]);
+        facadeService.getInvites().then((data) => setList(data));
+        setTimeout(() => {
+            setList(list);
+        }, 1000);
     };
 
     useEffect(() => {
-        // facadeService.subscribeNotifications(facadeService.getCurrentUser().id, func);
-        facadeService.getInvites();
+        facadeService.subscribeNotifications(facadeService.getCurrentUser().id, func);
     }, []);
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={'Notifications'}/>
-            <FlatList style={myStyles.componentView} data={list} renderItem={({item}) => <Item notification={item}/>}/>
+            <FlatList style={myStyles.componentView} data={list} renderItem={({item}) => <Item notification={item} facadeService={facadeService}/>}/>
             <FooterBar current={screen}/>
         </View>
     );
@@ -46,6 +73,24 @@ const Notifications = ({navigation}: Props) => {
 const myStyles = StyleSheet.create({
     componentView: {
         flex: 1,
+    },
+    buttonsView: {
+        flex: 1,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    itemView: {
+        flex: 1,
+        margin: 10,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    itemButton: {
+        flex: 1,
+        margin: 5,
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     button: {
         minWidth: '60%',

@@ -34,7 +34,7 @@ class DatabaseService {
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                // console.log('subscribed to the \'campaignsList\' channel successfully');
+                callback();
             }
         });
     }

@@ -3,6 +3,7 @@ import CampaignService from "./CampaignService";
 import { CampaignType } from "../types/Campaign";
 import { UserType } from "../types/User";
 import DatabaseService from "./DatabaseService";
+import { InviteType } from "../types/Invite";
 
 class FacadeService {
     constructor(private userService: UserService, private campaignService: CampaignService, private databaseService: DatabaseService){}
@@ -74,8 +75,8 @@ class FacadeService {
         this.userService.sendFriendInvite(list);
     }
 
-    public async getInvites() {
-        this.userService.getInvites();
+    public async getInvites() : Promise<InviteType[]> {
+        return this.userService.getInvites();
     }
 }
 

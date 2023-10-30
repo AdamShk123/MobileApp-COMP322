@@ -78,6 +78,14 @@ class FacadeService {
     public async getInvites() : Promise<InviteType[]> {
         return this.userService.getInvites();
     }
+
+    public async deleteNotification(id: string): Promise<void> {
+        this.userService.deleteNotification(id);
+    }
+
+    public async addFriend(id: string): Promise<void> {
+        this.userService.addFriend(id);
+    }
 }
 
 export default FacadeService;

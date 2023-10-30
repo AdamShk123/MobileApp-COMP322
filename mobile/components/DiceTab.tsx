@@ -23,7 +23,7 @@ const DiceTab = ({navigation}: Props) => {
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <View style={myStyles.sliderView}>
-                <Text style={[appStyles.primaryText, appStyles.h4, myStyles.sidesText]}>{sides}</Text>
+                <Text style={[appStyles.primaryText, appStyles.h4]}>{sides}</Text>
                 <Slider value={20} vertical={true} step={1} minimumValue={4} maximumValue={20} style={myStyles.slider} thumbTintColor={'#F5B40F'} minimumTrackTintColor={'white'} maximumTrackTintColor={'white'} onValueChange={(value) => {
                     setSides(value);
                 }}/>
@@ -55,9 +55,6 @@ const myStyles = StyleSheet.create({
         alignItems: 'center',
         justifyContent: 'center',
     },
-    sidesText: {
-        marginBottom: '20%',
-    },
     button: {
         width: '50%',
         height: 50,
@@ -65,8 +62,8 @@ const myStyles = StyleSheet.create({
         justifyContent: 'center',
     },
     slider: {
-        width: Dimensions.get('screen').height * .2,
-        height: Dimensions.get('screen').height * .2,
+        width: '180%',
+        height: '60%',
         transform: [{rotate: '-90deg'}]
     }
 });

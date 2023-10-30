@@ -20,19 +20,17 @@ type ItemProps = {
 const Item = ({notification, facadeService} : ItemProps) => {
 
     const decline = () => {
-        console.log('declined!');
-        // delete notification
+        facadeService.deleteNotification(notification.id).then(() => console.log('deleted!'));
     };
 
     const accept = () => {
-        console.log('accepted');
-        // delete notification
-        // add friend
+        facadeService.deleteNotification(notification.id).then(() => console.log('accepted!'));
+        facadeService.addFriend(notification.pid).then(() => console.log('new friend!'));
     };
 
     return (
         <View style={[myStyles.itemView, appStyles.secondaryBackground]}>
-            <Text style={[appStyles.primaryText, appStyles.h6]}>Invite From: {notification.pobject!.email}</Text>
+            <Text style={[appStyles.primaryText, appStyles.h6]}>Friend Invite: {notification.pobject!.email}</Text>
             <View style={myStyles.buttonsView}>
                 <Pressable style={[appStyles.primaryBackground, myStyles.itemButton]} onPress={accept}>
                     <Text style={[appStyles.primaryText, appStyles.h6]}>Accept</Text>
@@ -51,10 +49,7 @@ const Notifications = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
     const func = () => {
-        facadeService.getInvites().then((data) => setList(data));
-        setTimeout(() => {
-            setList(list);
-        }, 1000);
+        facadeService.getInvites().then((data) => setList(data)); 
     };
 
     useEffect(() => {

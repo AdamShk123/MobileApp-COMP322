@@ -22,14 +22,14 @@ class DatabaseService {
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                // console.log('subscribed to the \'campaignsList\' channel successfully');
+                callback();
             }
         });
     }
 
     public subscribeNotifications(userID: string, callback: () => void) {
         const channel = this.supabase.channel('campaignsList');
-        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
+        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'invite'}, (payload) => {
             callback();
         })
         channel.subscribe((status) => {
@@ -40,6 +40,16 @@ class DatabaseService {
     }
 
     public subscribeOnline(userID: string, callback: (presences: any) => void): void {
+        const friends = this.supabase.channel('campaignsList');
+        friends.on('postgres_changes', {event: '*', schema: 'public', table: 'friend'}, (payload) => {
+            callback([]);
+        })
+        friends.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                callback([]);
+            }
+        });
+
         const channel = this.supabase.channel('onlineStatus', {
             config: {
                 presence: {
@@ -87,7 +97,7 @@ class DatabaseService {
     }
 
     public delete(from: string): any{
-        const query = this.supabase.from(from).delete().select();
+        const query = this.supabase.from(from).delete();
         return query;
     } 
 

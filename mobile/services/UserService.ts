@@ -46,8 +46,7 @@ class UserService {
         const transformed = this.databaseService.await(filtered).then((data) => {
             const rawData = data['data'][0];
             
-            const user: UserType = {email: rawData['pemail'], id: rawData['pid'], created: rawData['pcreated'], first: rawData['pfirst'], last: rawData['plast'], nickname: rawData['pnickname']}
-        
+            const user: UserType = this.userObjectHelper(rawData);
             return user;
         });
 
@@ -62,7 +61,7 @@ class UserService {
             const rawData : any[] = data['data'];
             const friendsList : UserType[] = [];
             rawData.forEach((item) => {
-                friendsList.push({id: item['player']['pid'], email: item['player']['pemail'], nickname: item['player']['pnickname'], first: item['player']['pfirst'], last: item['player']['plast'], created: item['player']['pcreated']})
+                friendsList.push(this.userObjectHelper(item['player']));
             });
             return friendsList;
         });
@@ -78,7 +77,7 @@ class UserService {
             const rawData: any[] = data['data'];
             const usersList : UserType[] = [];
             rawData.forEach((item) => {
-                usersList.push({id: item['pid'], email: item['pemail'], nickname: item['pnickname'], first: item['pfirst'], last: item['plast'], created: item['pcreated']});
+                usersList.push(this.userObjectHelper(item));
             });
             const filterFriends = this.getFriends(this.currentUser.id).then((list) => {
                 return usersList.filter((item) => {
@@ -109,7 +108,7 @@ class UserService {
     }
 
     public async getInvites(id: string = this.currentUser.id): Promise<InviteType[]> {
-        const initial = this.databaseService.select('invite', '*');
+        const initial = this.databaseService.select('invite', '*, player!invite_pid_fkey(*)');
         const filtered = this.databaseService.filter(initial, 'playerid', 'eq', id);
 
         const transformed = this.databaseService.await(filtered).then((data) => {
@@ -117,15 +116,29 @@ class UserService {
             const rawData = data['data'];
             const formatted : InviteType[] = [];
             rawData.forEach((item : any) => {
-                this.getUser(item['pid']).then((value) => {
-                    formatted.push({playerid: item['playerid'], pid: item['pid'], cid: item['cid'], date: item['date'], type: item['type'], pobject: value});
-                    console.log(formatted);
-                })
+                formatted.push({id: item['iid'], playerid: item['playerid'], pid: item['pid'], cid: item['cid'], date: item['date'], type: item['type'], pobject: this.userObjectHelper(item['player'])});
             });
             return formatted;
         });
 
         return transformed;
+    }
+
+    public async deleteNotification(id: string): Promise<void> {
+        const initial = this.databaseService.delete('invite');
+        const filtered = this.databaseService.filter(initial, 'iid', 'eq', id);
+        this.databaseService.await(filtered);
+    }
+
+    public async addFriend(id: string): Promise<void> {
+        const q1 = this.databaseService.insert('friend', {playerid1: this._currentUser?.id, playerid2: id});
+        const q2 = this.databaseService.insert('friend', {playerid1: id, playerid2: this._currentUser?.id});
+        this.databaseService.await(q1);
+        this.databaseService.await(q2);
+    }
+
+    private userObjectHelper(item: any) : UserType {
+        return {id: item['pid'], email: item['pemail'], nickname: item['pnickname'], first: item['pfirst'], last: item['plast'], created: item['pcreated']} as UserType;
     }
 }
 

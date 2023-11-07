@@ -2,12 +2,15 @@ import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { API_KEY, API_URL } from '@env';
 import { decode } from 'base64-arraybuffer';
+import { chdir } from 'process';
 
 class DatabaseService {
 
     private url: string;
     private key: string;
     private supabase: SupabaseClient;
+
+    private campaignChannel: any;
 
     constructor(){
         this.url = API_URL;
@@ -73,6 +76,41 @@ class DatabaseService {
                 channel.track({online: true});
             }
         });
+    }
+
+    public subscribeCampaignOnline(campaignID: string, userID: string, callback: (presences: any) => void) {
+        const channel = this.supabase.channel('campaign-' + campaignID, {
+            config: {
+                broadcast: {
+                    self: true
+                },
+                presence: {
+                    key: userID
+                }
+            }
+        });
+        
+        channel.on('presence', {event: 'sync'}, () => {
+            callback(channel.presenceState());
+        }).on('presence', {event: 'join'}, ({key, newPresences}) => {
+            callback(channel.presenceState());
+            channel.send({type: 'broadcast', event: 'text', payload: {message: 'user' + userID + 'is connected!'}});
+        }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
+            callback(channel.presenceState());
+            channel.send({type: 'broadcast', event: 'text', payload: {message: 'user' + userID + 'has left!'}});
+        }).on('broadcast', {event: 'text'}, (payload) => {
+            console.log(payload.payload.message);
+        }).subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                console.log('subscribed');
+            }
+        });
+
+        this.campaignChannel = channel;
+    }
+
+    public sendCampaignMessage(message: string) {
+        this.campaignChannel.send({type: 'broadcast', event: 'text', payload: {message: message}});
     }
 
     public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {

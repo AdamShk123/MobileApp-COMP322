@@ -2,8 +2,9 @@ import { View, StyleSheet, Pressable, Text, Dimensions } from "react-native";
 import appStyles from '../styles';
 import { TabParamList } from './Campaign';
 import {MaterialTopTabNavigationProp} from '@react-navigation/material-top-tabs';
-import { useState } from "react";
+import { useState, useContext } from "react";
 import Slider from '@react-native-community/slider';
+import { ServiceContext } from "../App";
 
 type Props = {
     navigation: MaterialTopTabNavigationProp<TabParamList>;
@@ -15,8 +16,11 @@ const DiceTab = ({navigation}: Props) => {
     const [num, setNum] = useState(0);
     const [sides, setSides] = useState(20);
 
+    const facadeService = useContext(ServiceContext);
+
     const onPress = () => {
         const num = Math.ceil(Math.random() * sides);
+        facadeService.sendCampaignMessage('user threw a ' + sides + ' sided die and got ' + num);
         setNum(num);
     };
 

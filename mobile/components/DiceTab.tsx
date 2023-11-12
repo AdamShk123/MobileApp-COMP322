@@ -20,7 +20,6 @@ const DiceTab = ({navigation}: Props) => {
 
     const onPress = () => {
         const num = Math.ceil(Math.random() * sides);
-        facadeService.sendCampaignMessage('user threw a ' + sides + ' sided die and got ' + num);
         setNum(num);
     };
 

@@ -94,6 +94,7 @@ const AddFriend = ({navigation}: Props) => {
     const sendInvite = () => {
         facadeService.sendFriendInvites(chosen);
         setList([]);
+        setChosen([]);
         setValue('');
         navigation.goBack();
     };

@@ -63,9 +63,6 @@ class FacadeService {
         this.databaseService.subscribeCampaigns(callback);
     }
 
-    public subscribeCampaignOnline(campaignID: string, userID: string, callback: (presences: any) => void): void {
-        this.databaseService.subscribeCampaignOnline(campaignID, userID, callback);
-    }
     public subscribeOnline(userID: string, callback: (presences: any) => void): void {
         this.databaseService.subscribeOnline(userID, callback);
     }
@@ -88,10 +85,6 @@ class FacadeService {
 
     public async addFriend(id: string): Promise<void> {
         this.userService.addFriend(id);
-    }
-
-    public sendCampaignMessage(message: string) {
-        this.databaseService.sendCampaignMessage(message);
     }
 }
 

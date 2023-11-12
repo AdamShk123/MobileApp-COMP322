@@ -2,7 +2,6 @@ import 'react-native-url-polyfill/auto';
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { API_KEY, API_URL } from '@env';
 import { decode } from 'base64-arraybuffer';
-import { chdir } from 'process';
 
 class DatabaseService {
 
@@ -31,7 +30,7 @@ class DatabaseService {
     }
 
     public subscribeNotifications(userID: string, callback: () => void) {
-        const channel = this.supabase.channel('campaignsList');
+        const channel = this.supabase.channel('notifications');
         channel.on('postgres_changes', {event: '*', schema: 'public', table: 'invite'}, (payload) => {
             callback();
         })
@@ -43,7 +42,7 @@ class DatabaseService {
     }
 
     public subscribeOnline(userID: string, callback: (presences: any) => void): void {
-        const friends = this.supabase.channel('campaignsList');
+        const friends = this.supabase.channel('friendsList');
         friends.on('postgres_changes', {event: '*', schema: 'public', table: 'friend'}, (payload) => {
             callback([]);
         })
@@ -62,13 +61,10 @@ class DatabaseService {
         });
         channel.on('presence', {event: 'sync'}, () => {
             callback(channel.presenceState());
-            // console.log('sync');
         }).on('presence', {event: 'join'}, ({key, newPresences}) => {
             callback(channel.presenceState());
-            // console.log('join');
         }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
             callback(channel.presenceState());
-            // console.log('leave');
         });
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
@@ -107,10 +103,6 @@ class DatabaseService {
         });
 
         this.campaignChannel = channel;
-    }
-
-    public sendCampaignMessage(message: string) {
-        this.campaignChannel.send({type: 'broadcast', event: 'text', payload: {message: message}});
     }
 
     public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {

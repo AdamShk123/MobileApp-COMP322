@@ -16,16 +16,13 @@ import ChatTab from "./ChatTab";
 
 export type TabParamList = {
     Dice: undefined,
-    Chat: {message: string},
+    Chat: undefined,
 };
 
 const Tab = createMaterialTopTabNavigator<TabParamList>();
 
-export const BroadcastContext = createContext<string>('');
-
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
-    const [broadcast, setBroadcast] = useState<string>('');
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
@@ -35,15 +32,10 @@ const Campaign = ({navigation, route}: Props) => {
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
     let prevValues = {x: 0, y: 0, scale: 1};
-    
-    const callback = (presences: any) => {
-        console.log(presences);
-    };
 
     useEffect(() => {
         if(route.params.id){
             setID(route.params.id);
-            facadeService.subscribeCampaignOnline(route.params.id, facadeService.getCurrentUser().id, callback);
             facadeService.getCampaign(route.params.id).then((data: CampaignType) => {
                 setData(data);
                 facadeService.updateCampaignPlayedData(data.id);
@@ -118,7 +110,6 @@ const Campaign = ({navigation, route}: Props) => {
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <Button title="press" onPress={() => {setBroadcast('hel')}}/>
             <Animated.View
                 style={myStyles.mapView}
             >
@@ -155,14 +146,12 @@ const Campaign = ({navigation, route}: Props) => {
                 </PanGestureHandler>
             </Animated.View>
             <View style={myStyles.tabsView}>
-                <BroadcastContext.Provider value={broadcast}>
-                    <NavigationContainer independent={true}>
-                        <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
-                            <Tab.Screen name='Dice' component={DiceTab}/>
-                            <Tab.Screen name='Chat' component={ChatTab} initialParams={{message: broadcast}}/>
-                        </Tab.Navigator>
-                    </NavigationContainer>
-                </BroadcastContext.Provider>
+                <NavigationContainer independent={true}>
+                    <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
+                        <Tab.Screen name='Dice' component={DiceTab}/>
+                        <Tab.Screen name='Chat' component={ChatTab}/>
+                    </Tab.Navigator>
+                </NavigationContainer>
             </View>
             <FooterBar current={screen}/>
         </View>

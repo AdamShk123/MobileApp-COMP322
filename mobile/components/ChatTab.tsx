@@ -1,6 +1,6 @@
 import { View, StyleSheet, FlatList, TextInput, Text } from "react-native";
 import appStyles from '../styles';
-import { BroadcastContext, TabParamList } from './Campaign';
+import { TabParamList } from './Campaign';
 import { useContext, useEffect, useState } from "react";
 import { ServiceContext } from "../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
@@ -15,16 +15,10 @@ const Item = () => {
     );
 }
 
-const ChatTab = ({, route, navigation}: Props) => {
+const ChatTab = ({route, navigation}: Props) => {
     const [list, setList] = useState<string[]>([]);
 
     const facadeService = useContext(ServiceContext);
-    const broadcast = useContext(BroadcastContext);
-
-
-    useEffect(() => {
-        console.log(broadcast);
-    }, [broadcast]);
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>

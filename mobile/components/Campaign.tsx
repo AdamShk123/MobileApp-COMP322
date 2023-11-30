@@ -3,21 +3,29 @@ import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
-import { useContext, useEffect, useState, useRef, createRef } from 'react';
+import { useContext, useEffect, useState, useRef, createRef, createContext } from 'react';
 import { CampaignType } from "../types/Campaign";
-
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { API_URL } from '@env';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
+import { NavigationContainer } from "@react-navigation/native";
+import DiceTab from "./DiceTab";
+import ChatTab from "./ChatTab";
+
+export type TabParamList = {
+    Dice: undefined,
+    Chat: undefined,
+};
+
+const Tab = createMaterialTopTabNavigator<TabParamList>();
 
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
-    const [mapVisible, setMapVisible] = useState('block');
-    const [tabsVisible, setTabsVisible] = useState('block');
     const baseScale = useRef(new Animated.Value(1)).current;
     const pinchScale = useRef(new Animated.Value(1)).current;
     const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
@@ -73,7 +81,6 @@ const Campaign = ({navigation, route}: Props) => {
                 baseScale.setValue(minZoom);
                 prevValues.scale = minZoom;
             }
-            console.log(baseScale);
         }
     };
 
@@ -85,7 +92,6 @@ const Campaign = ({navigation, route}: Props) => {
             translateX.setValue(0);
             translateY.setOffset(prevValues.y);
             translateY.setValue(0);
-            console.log(translateX.__getValue(), translateY.__getValue())
         }
     };
 
@@ -102,22 +108,10 @@ const Campaign = ({navigation, route}: Props) => {
     const panRef = createRef()
 
     return (
-        <View style={myStyles.componentView}>
+        <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <Button
-                title='map'
-                onPress={() => {
-                    if (mapVisible === 'none') {
-                        setMapVisible('block');
-                    } else {
-                        setMapVisible('none');
-                    }
-                    console.log('Map Toggled')
-                }}
-            />
             <Animated.View
                 style={myStyles.mapView}
-                display={mapVisible}
             >
                 <PanGestureHandler
                     onGestureEvent={MapPanHandler}
@@ -151,21 +145,13 @@ const Campaign = ({navigation, route}: Props) => {
                     </Animated.View>
                 </PanGestureHandler>
             </Animated.View>
-            <Button
-                title='tabs'
-                onPress={() => {
-                    if (tabsVisible === 'none') {
-                        setTabsVisible('block');
-                    } else {
-                        setTabsVisible('none');
-                    }
-                    console.log('Tabs Toggled')
-                }}
-            />
-            <View
-                style={myStyles.tabsView}
-                display={tabsVisible}
-            >
+            <View style={myStyles.tabsView}>
+                <NavigationContainer independent={true}>
+                    <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
+                        <Tab.Screen name='Dice' component={DiceTab}/>
+                        <Tab.Screen name='Chat' component={ChatTab}/>
+                    </Tab.Navigator>
+                </NavigationContainer>
             </View>
             <FooterBar current={screen}/>
         </View>

@@ -15,7 +15,6 @@ import Profile from './components/Profile';
 import AddCampaign from './components/AddCampaign';
 import AddFriend from './components/AddFriend';
 import Campaign from './components/Campaign';
-import FooterBar from './components/FooterBar';
 
 import DatabaseService from './services/DatabaseService';
 import UserService from './services/UserService';
@@ -106,7 +105,6 @@ const App = () => {
                             <Stack.Screen name='AddCampaign' component={AddCampaign} options={{headerShown: false}}/>
                             <Stack.Screen name='AddFriend' component={AddFriend} options={{headerShown: false}}/>
                         </Stack.Navigator>
-                        {/* <FooterBar current={name}/> */}
                     </NavigationContainer>
                 </ScreenContext.Provider>
             </ServiceContext.Provider>

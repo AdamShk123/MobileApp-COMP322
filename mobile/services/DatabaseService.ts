@@ -9,6 +9,8 @@ class DatabaseService {
     private key: string;
     private supabase: SupabaseClient;
 
+    private campaignChannel: any;
+
     constructor(){
         this.url = API_URL;
         this.key = API_KEY;
@@ -22,24 +24,34 @@ class DatabaseService {
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                // console.log('subscribed to the \'campaignsList\' channel successfully');
+                callback();
             }
         });
     }
 
     public subscribeNotifications(userID: string, callback: () => void) {
-        const channel = this.supabase.channel('campaignsList');
-        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'plays'}, (payload) => {
+        const channel = this.supabase.channel('notifications');
+        channel.on('postgres_changes', {event: '*', schema: 'public', table: 'invite'}, (payload) => {
             callback();
         })
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
-                // console.log('subscribed to the \'campaignsList\' channel successfully');
+                callback();
             }
         });
     }
 
     public subscribeOnline(userID: string, callback: (presences: any) => void): void {
+        const friends = this.supabase.channel('friendsList');
+        friends.on('postgres_changes', {event: '*', schema: 'public', table: 'friend'}, (payload) => {
+            callback([]);
+        })
+        friends.subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                callback([]);
+            }
+        });
+
         const channel = this.supabase.channel('onlineStatus', {
             config: {
                 presence: {
@@ -49,13 +61,10 @@ class DatabaseService {
         });
         channel.on('presence', {event: 'sync'}, () => {
             callback(channel.presenceState());
-            // console.log('sync');
         }).on('presence', {event: 'join'}, ({key, newPresences}) => {
             callback(channel.presenceState());
-            // console.log('join');
         }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
             callback(channel.presenceState());
-            // console.log('leave');
         });
         channel.subscribe((status) => {
             if(status == 'SUBSCRIBED'){
@@ -63,6 +72,37 @@ class DatabaseService {
                 channel.track({online: true});
             }
         });
+    }
+
+    public subscribeCampaignOnline(campaignID: string, userID: string, callback: (presences: any) => void) {
+        const channel = this.supabase.channel('campaign-' + campaignID, {
+            config: {
+                broadcast: {
+                    self: true
+                },
+                presence: {
+                    key: userID
+                }
+            }
+        });
+        
+        channel.on('presence', {event: 'sync'}, () => {
+            callback(channel.presenceState());
+        }).on('presence', {event: 'join'}, ({key, newPresences}) => {
+            callback(channel.presenceState());
+            channel.send({type: 'broadcast', event: 'text', payload: {message: 'user' + userID + 'is connected!'}});
+        }).on('presence', {event: 'leave'}, ({key, leftPresences}) => {
+            callback(channel.presenceState());
+            channel.send({type: 'broadcast', event: 'text', payload: {message: 'user' + userID + 'has left!'}});
+        }).on('broadcast', {event: 'text'}, (payload) => {
+            console.log(payload.payload.message);
+        }).subscribe((status) => {
+            if(status == 'SUBSCRIBED'){
+                console.log('subscribed');
+            }
+        });
+
+        this.campaignChannel = channel;
     }
 
     public async uploadImage(bucket: string, id: string, uri: string) : Promise<any> {
@@ -87,7 +127,7 @@ class DatabaseService {
     }
 
     public delete(from: string): any{
-        const query = this.supabase.from(from).delete().select();
+        const query = this.supabase.from(from).delete();
         return query;
     } 
 

@@ -19,15 +19,16 @@ export class Message extends Realm.Object<Message> {
 }
 
 export class ChatRoom extends Realm.Object<ChatRoom> {
-    id!: Realm.BSON.ObjectId;
+    _id!: Realm.BSON.ObjectId;
     name!: string;
     messages!: Realm.List<Message>;
     characters!: Realm.List<Character>
 
     static schema: ObjectSchema = {
-        name: 'Campaign',
+        name: 'ChatRoom',
+        primaryKey: '_id',
         properties: {
-            id: 'objectId',
+            _id: 'objectId',
             name: 'string',
             characters: 'Character[]',
             messages: {type: 'list', objectType: 'Message'}
@@ -35,16 +36,20 @@ export class ChatRoom extends Realm.Object<ChatRoom> {
     }
 }
 
-export class Campaign extends Realm.Object<Campaign> {
-    id!: Realm.BSON.ObjectId;
+export class CampaignRealm extends Realm.Object<CampaignRealm> {
+    _id!: string;
     name!: string;
     created!: Date;
     characters!: Realm.List<Character>;
     chatRooms!: Realm.List<ChatRoom>;
 
     static schema: ObjectSchema = {
-        name: 'Campaign',
+        name: 'CampaignRealm',
+        primaryKey: '_id',
         properties: {
+            _id: 'string',
+            name: 'string',
+            created: 'date',
             characters: 'Character[]',
             chatRooms: 'ChatRoom[]',
         }

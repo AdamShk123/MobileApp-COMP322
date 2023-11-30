@@ -1,5 +1,19 @@
 import Realm, { ObjectSchema } from "realm";
 
+export class Position extends Realm.Object<Position> {
+    x!: number;
+    y!: number;
+
+    static schema: ObjectSchema = {
+        name: 'Position',
+        embedded: true, 
+        properties: {
+            x: 'int',
+            y: 'int',
+        }
+    }
+}
+
 export class Stats extends Realm.Object<Stats> {
     str!: number;
     dex!: number;
@@ -41,31 +55,33 @@ export class Status extends Realm.Object<Status> {
 }
 
 export class Character extends Realm.Object<Character> {
-    id!: Realm.BSON.ObjectId;
+    _id!: Realm.BSON.ObjectId;
     name!: String;
     level!: number;
     class!: string;
     race!: string;
     stats!: Stats;
     status!: Status;
+    position!: Position;
     abitilies!: Realm.List<string>;
     items!: Realm.List<string>;
 
     static schema: ObjectSchema = {
         name: 'Character',
         properties: {
-            id: 'objectId',
+            _id: 'objectId',
             name: 'string',
             level: 'int',
             class: 'string',
             race: 'string',
             stats: 'Stats',
             status: 'Status',
+            position: 'Position',
             abilities: {type: 'list', objectType: 'string'},
             items: {type: 'list', objectType: 'string'},
-            campaign: {type: 'linkingObjects', objectType: 'Campaign', property: 'characters'}
+            campaign: {type: 'linkingObjects', objectType: 'CampaignRealm', property: 'characters'}
         },
-        primaryKey: 'id'
+        primaryKey: '_id'
     }
 }
 

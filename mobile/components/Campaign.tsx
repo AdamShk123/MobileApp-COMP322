@@ -13,6 +13,11 @@ import FooterBar from './FooterBar';
 import { NavigationContainer } from "@react-navigation/native";
 import DiceTab from "./DiceTab";
 import ChatTab from "./ChatTab";
+import { useApp, useObject, useQuery, useRealm } from "@realm/react";
+import { Character, Stats, Status } from "../models/Character";
+import { CampaignRealm, ChatRoom } from "../models/Campaign";
+import { CanonicalObjectSchema, List, ObjectChangeCallback } from "realm";
+import { Results, Object } from "realm/dist/bundle";
 
 export type TabParamList = {
     Dice: undefined,
@@ -20,6 +25,8 @@ export type TabParamList = {
 };
 
 const Tab = createMaterialTopTabNavigator<TabParamList>();
+
+export const CampaignContext = createContext<CampaignRealm | null>(null);
 
 const Campaign = ({navigation, route}: Props) => {
     const [data, setData] = useState<CampaignType>({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
@@ -32,6 +39,16 @@ const Campaign = ({navigation, route}: Props) => {
     const translateX = useRef(new Animated.Value(0)).current;
     const translateY = useRef(new Animated.Value(0)).current;
     let prevValues = {x: 0, y: 0, scale: 1};
+
+    const campaign = useQuery(CampaignRealm, campaigns => {
+        return campaigns
+    });
+    const characters = useQuery(Character, characters => {
+        return characters
+    });
+    const chat = useQuery(ChatRoom, chats => {
+        return chats
+    });
 
     useEffect(() => {
         if(route.params.id){
@@ -46,6 +63,12 @@ const Campaign = ({navigation, route}: Props) => {
         translateY.setOffset(prevValues.y);
         translateY.setValue(0);
         baseScale.setValue(1);
+
+        realm.subscriptions.update((subs) => {
+            subs.add(campaign, {name:"campaign"});
+            subs.add(characters, {name:"characters"});
+            subs.add(chat, {name: 'chats'});
+        });
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -107,9 +130,46 @@ const Campaign = ({navigation, route}: Props) => {
     const pinchRef = createRef()
     const panRef = createRef()
 
+    const realm = useRealm();
+    const app = useApp();
+        
+    const c = useObject(CampaignRealm, data.id.toString());
+
+    function click() {
+        console.log("hi")
+        console.log(c);
+        c?.characters.forEach((character) => {
+            console.log(character);
+        });
+        // realm.write(() => {
+        //     const room = realm.create(ChatRoom, {
+        //         _id: new Realm.BSON.ObjectID(),
+        //         name: 'all',
+        //         characters: c?.characters
+        //     });
+        //     c?.chatRooms.push(room);
+        // });
+        // realm.write(() => {
+        //     const character = realm.create(Character, {
+        //         _id: new Realm.BSON.ObjectID(), 
+        //         name: 'Thorin', 
+        //         level: 10, 
+        //         class: 'Fighter', 
+        //         race: 'Dwarf', 
+        //         stats: {str: 12, dex: 8, int: 18, wis: 12, con: 10, cha: 18} as Stats,
+        //         status: {hp: 100, mp: 100} as Status
+        //     });
+        //     c?.characters.push(character);
+        // });
+        // realm.write(() => {
+        //     realm.create(CampaignRealm, {_id: data.id.toString(), name: data.name, created: data.created});
+        // });
+    }
+
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
+            {/* <Button title="addCharacter" onPress={click}/> */}
             <Animated.View
                 style={myStyles.mapView}
             >
@@ -146,12 +206,14 @@ const Campaign = ({navigation, route}: Props) => {
                 </PanGestureHandler>
             </Animated.View>
             <View style={myStyles.tabsView}>
-                <NavigationContainer independent={true}>
-                    <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
-                        <Tab.Screen name='Dice' component={DiceTab}/>
-                        <Tab.Screen name='Chat' component={ChatTab}/>
-                    </Tab.Navigator>
-                </NavigationContainer>
+                <CampaignContext.Provider value={c}>
+                    <NavigationContainer independent={true}>
+                        <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
+                            <Tab.Screen name='Dice' component={DiceTab}/>
+                            <Tab.Screen name='Chat' component={ChatTab}/>
+                        </Tab.Navigator>
+                    </NavigationContainer>
+                </CampaignContext.Provider>
             </View>
             <FooterBar current={screen}/>
         </View>

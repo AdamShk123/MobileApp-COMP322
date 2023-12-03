@@ -4,19 +4,23 @@ import { CampaignContext, TabParamList } from './Campaign';
 import { useContext, useEffect, useRef, useState } from "react";
 import { ServiceContext } from "../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { Message } from "../models/Campaign";
-import { useRealm } from "@realm/react";
+import { ChatRoom, Message } from "../models/Campaign";
+import { useObject, useRealm } from "@realm/react";
 
 type Props = NativeStackScreenProps<TabParamList, 'Chat'>;
 
 type ItemProps = {
+    sent: string;
     text: string;
+    time: Date;
 }
 
-const Item = ({text} : ItemProps) => {
+const Item = ({sent, text, time} : ItemProps) => {
     return (
-        <View style={myStyles.itemView}>
+        <View style={[myStyles.itemView, appStyles.secondaryBackground]}>
+            <Text style={[appStyles.h4, appStyles.primaryText]}>{sent}</Text>
             <Text style={[appStyles.h4, appStyles.primaryText]}>{text}</Text>
+            <Text style={[appStyles.h4, appStyles.primaryText]}>{time.getHours().toString() + ":" + time.getMinutes() + " " + (time.getMonth() + 1) + "/" + time.getDate()}</Text>
         </View>
     );
 }
@@ -24,6 +28,7 @@ const Item = ({text} : ItemProps) => {
 const ChatTab = ({route, navigation}: Props) => {
     const [list, setList] = useState<Message[]>([]);
     const [text, setText] = useState<string>('');
+    const [added, setAdded] = useState<boolean>(false);
 
     const facadeService = useContext(ServiceContext);
 
@@ -31,30 +36,19 @@ const ChatTab = ({route, navigation}: Props) => {
 
     const realm = useRealm();
 
+    const listRef = useRef<Message[]>(list);
+    const addedRef = useRef<boolean>(added);
+
     function onDocumentChange(a: any, b: any) {
-        // console.log(a);
-        // console.log(b);
         setList(a);
     }
 
     useEffect(() => {
-        // const messages: Message[] = [];
-        // campaign?.chatRooms.at(0)?.messages.forEach((message) => {
-        //     messages.push(message);
-        // });
-        // setList(messages);
-        
-        campaign?.chatRooms.at(0)?.messages?.addListener(onDocumentChange);
+        if(campaign && !added) {
+            campaign?.chatRooms.at(0)?.messages.addListener(onDocumentChange);
+            setAdded(true);
+        }
     }, [campaign]);
-
-    function click() {
-        console.log('hi');
-        campaign?.chatRooms.at(0)?.messages.forEach((message) => {
-            console.log(message.sent);
-            console.log(message.text);
-            console.log(message.time);
-        });
-    }
 
     function submit() {
         realm.write(() => {
@@ -64,12 +58,11 @@ const ChatTab = ({route, navigation}: Props) => {
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
-            {/* <Button title="button" onPress={click}></Button> */}
-            <FlatList style={myStyles.listView} data={list} renderItem={(message) => <Item text={message.item.text}/>}/>
+            <FlatList initialNumToRender={10} style={myStyles.listView} data={list} renderItem={(message) => <Item text={message.item.text} sent={message.item.sent} time={message.item.time}/>}/>
             <View style={myStyles.input}>
-                <TextInput style={myStyles.inputText} onChangeText={(str) => setText(str)}/>
+                <TextInput style={[myStyles.inputText, appStyles.h4]} onChangeText={(str) => setText(str)}/>
                 <Pressable style={myStyles.inputButton} onPress={submit}>
-                    <Text style={appStyles.primaryText}>Input</Text>
+                    <Text style={[appStyles.primaryText, appStyles.h4]}>Input</Text>
                 </Pressable>
             </View>
         </View>
@@ -85,6 +78,9 @@ const myStyles = StyleSheet.create({
     },
     itemView: {
         flex: 1,
+        margin: 10, 
+        borderColor: appStyles.primaryText.color,
+        borderWidth: 2, 
     },
     input: {
         borderTopColor: appStyles.primaryText.color,
@@ -100,6 +96,8 @@ const myStyles = StyleSheet.create({
     inputButton: {
         backgroundColor: appStyles.secondaryBackground.backgroundColor,
         flex: 1,
+        alignItems: 'center',
+        justifyContent: 'center',
     }
 });
 

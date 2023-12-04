@@ -7,21 +7,23 @@ import { useContext, useEffect, useState, useRef, createRef, createContext } fro
 import { CampaignType } from "../types/Campaign";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { API_URL } from '@env';
-import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureEvent, GestureStateChangeEvent, PanGestureHandler, PinchGestureHandler, State, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
 import { NavigationContainer } from "@react-navigation/native";
 import DiceTab from "./DiceTab";
 import ChatTab from "./ChatTab";
 import { useApp, useObject, useQuery, useRealm } from "@realm/react";
-import { Character, Stats, Status } from "../models/Character";
+import { Character, Position, Stats, Status } from "../models/Character";
 import { CampaignRealm, ChatRoom } from "../models/Campaign";
 import { CanonicalObjectSchema, List, ObjectChangeCallback } from "realm";
 import { Results, Object } from "realm/dist/bundle";
+import CharacterSheetTab from "./CharacterSheetTab";
 
 export type TabParamList = {
     Dice: undefined,
     Chat: undefined,
+    Character: undefined,
 };
 
 const Tab = createMaterialTopTabNavigator<TabParamList>();
@@ -44,7 +46,8 @@ const Campaign = ({navigation, route}: Props) => {
         return campaigns
     });
     const characters = useQuery(Character, characters => {
-        return characters
+        const result = characters.filtered("user_id == $0", facadeService.getCurrentUser().id);
+        return result;
     });
     const chat = useQuery(ChatRoom, chats => {
         return chats
@@ -131,86 +134,65 @@ const Campaign = ({navigation, route}: Props) => {
     const panRef = createRef()
 
     const realm = useRealm();
-    const app = useApp();
         
     const c = useObject(CampaignRealm, data.id.toString());
 
-    function click() {
-        console.log("hi")
-        console.log(c);
-        c?.characters.forEach((character) => {
-            console.log(character);
+    function tapCallback(event: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) {
+        realm.write(() => {
+            characters.at(0)!.position = {x: Math.round(event.x), y: Math.round(event.y)} as Position;
         });
-        // realm.write(() => {
-        //     const room = realm.create(ChatRoom, {
-        //         _id: new Realm.BSON.ObjectID(),
-        //         name: 'all',
-        //         characters: c?.characters
-        //     });
-        //     c?.chatRooms.push(room);
-        // });
-        // realm.write(() => {
-        //     const character = realm.create(Character, {
-        //         _id: new Realm.BSON.ObjectID(), 
-        //         name: 'Thorin', 
-        //         level: 10, 
-        //         class: 'Fighter', 
-        //         race: 'Dwarf', 
-        //         stats: {str: 12, dex: 8, int: 18, wis: 12, con: 10, cha: 18} as Stats,
-        //         status: {hp: 100, mp: 100} as Status
-        //     });
-        //     c?.characters.push(character);
-        // });
-        // realm.write(() => {
-        //     realm.create(CampaignRealm, {_id: data.id.toString(), name: data.name, created: data.created});
-        // });
     }
+
+    const tap = Gesture.Tap();
+    tap.onEnd(tapCallback);
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            {/* <Button title="addCharacter" onPress={click}/> */}
-            <Animated.View
-                style={myStyles.mapView}
-            >
-                <PanGestureHandler
-                    onGestureEvent={MapPanHandler}
-                    onHandlerStateChange={panStateChanged}
-                    ref={panRef}
-                    simultaneousHandlers={[pinchRef]}
-                    shouldCancelWhenOutside
+            <GestureDetector gesture={tap}>
+                <Animated.View
+                    style={myStyles.mapView}
                 >
-                    <Animated.View>
-                        <PinchGestureHandler
-                            onGestureEvent={MapPinchHandler}
-                            onHandlerStateChange={pinchStateChanged}
-                            ref={pinchRef}
-                            simultaneousHandlers={[panRef]}
-                        >
-                            <Animated.Image
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    transform: [
-                                        {translateX},
-                                        {translateY},
-                                        {scale}
-                                    ]
-                                }}
-                                source={{
-                                    uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
-                                }}
-                            />
-                        </PinchGestureHandler>
-                    </Animated.View>
-                </PanGestureHandler>
-            </Animated.View>
+                    <PanGestureHandler
+                        onGestureEvent={MapPanHandler}
+                        onHandlerStateChange={panStateChanged}
+                        ref={panRef}
+                        simultaneousHandlers={[pinchRef]}
+                        shouldCancelWhenOutside
+                    >
+                        <Animated.View>
+                            <PinchGestureHandler
+                                onGestureEvent={MapPinchHandler}
+                                onHandlerStateChange={pinchStateChanged}
+                                ref={pinchRef}
+                                simultaneousHandlers={[panRef]}
+                            >
+                                <Animated.Image
+                                    style={{
+                                        width: '100%',
+                                        height: '100%',
+                                        transform: [
+                                            {translateX},
+                                            {translateY},
+                                            {scale}
+                                        ]
+                                    }}
+                                    source={{
+                                        uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
+                                    }}
+                                />
+                            </PinchGestureHandler>
+                        </Animated.View>
+                    </PanGestureHandler>
+                </Animated.View>
+            </GestureDetector>
             <View style={myStyles.tabsView}>
                 <CampaignContext.Provider value={c}>
                     <NavigationContainer independent={true}>
-                        <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
+                        <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: [appStyles.secondaryBackground, {height: 50}], tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
                             <Tab.Screen name='Dice' component={DiceTab}/>
                             <Tab.Screen name='Chat' component={ChatTab}/>
+                            <Tab.Screen name='Character' component={CharacterSheetTab}/>
                         </Tab.Navigator>
                     </NavigationContainer>
                 </CampaignContext.Provider>

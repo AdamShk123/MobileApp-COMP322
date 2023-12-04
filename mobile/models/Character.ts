@@ -56,7 +56,8 @@ export class Status extends Realm.Object<Status> {
 
 export class Character extends Realm.Object<Character> {
     _id!: Realm.BSON.ObjectId;
-    name!: String;
+    user_id!: string;
+    name!: string;
     level!: number;
     class!: string;
     race!: string;
@@ -70,6 +71,7 @@ export class Character extends Realm.Object<Character> {
         name: 'Character',
         properties: {
             _id: 'objectId',
+            user_id: 'string',
             name: 'string',
             level: 'int',
             class: 'string',

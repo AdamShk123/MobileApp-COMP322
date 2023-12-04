@@ -6,6 +6,7 @@ import { ServiceContext } from "../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
 import { ChatRoom, Message } from "../models/Campaign";
 import { useObject, useRealm } from "@realm/react";
+import { Character } from "../models/Character";
 
 type Props = NativeStackScreenProps<TabParamList, 'Chat'>;
 
@@ -39,13 +40,24 @@ const ChatTab = ({route, navigation}: Props) => {
     const listRef = useRef<Message[]>(list);
     const addedRef = useRef<boolean>(added);
 
-    function onDocumentChange(a: any, b: any) {
+    function onMessagesChange(a: any, b: any) {
         setList(a);
+    }
+
+    function onCharacterChange(a: Character, b: any) {
+        if(b["changedProperties"][0] == "position") {
+            realm.write(() => {
+                campaign?.chatRooms.at(0)?.messages.push({sent: a.name, text: a.name + " moved to (" + a.position.x + ", " + a.position.y + ")", time: new Date()} as Message);      
+            });
+        }
     }
 
     useEffect(() => {
         if(campaign && !added) {
-            campaign?.chatRooms.at(0)?.messages.addListener(onDocumentChange);
+            campaign?.chatRooms.at(0)?.messages.addListener(onMessagesChange);
+            campaign.characters.forEach((character) => {
+                character.addListener(onCharacterChange);
+            });
             setAdded(true);
         }
     }, [campaign]);

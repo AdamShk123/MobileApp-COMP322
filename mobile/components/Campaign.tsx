@@ -1,18 +1,19 @@
-import { StyleSheet, View, Button, Text, Image, Animated } from "react-native";
+import { StyleSheet, View, Button, Text, Image, Animated, Dimensions } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
 import HeaderBar from './HeaderBar';
-import { useContext, useEffect, useState, useRef, createRef, createContext } from 'react';
+import { useContext, useEffect, useState, createContext, useRef, createRef } from 'react';
 import { CampaignType } from "../types/Campaign";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { API_URL } from '@env';
-import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
 import { NavigationContainer } from "@react-navigation/native";
 import DiceTab from "./DiceTab";
 import ChatTab from "./ChatTab";
+import CampaignMap from "./CampaignMap";
+import { PanGestureHandler, State } from 'react-native-gesture-handler';
 
 export type TabParamList = {
     Dice: undefined,
@@ -26,12 +27,13 @@ const Campaign = ({navigation, route}: Props) => {
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
-    const baseScale = useRef(new Animated.Value(1)).current;
-    const pinchScale = useRef(new Animated.Value(1)).current;
-    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
-    const translateX = useRef(new Animated.Value(0)).current;
-    const translateY = useRef(new Animated.Value(0)).current;
-    let prevValues = {x: 0, y: 0, scale: 1};
+    const screenHeight = Dimensions.get('window').height;
+    const sliderPos = useRef(new Animated.Value(0.5)).current;
+    const [mapFlex, setMapFlex] = useState(0.5);
+    const [tabsFlex, setTabsFlex] = useState(0.5);
+    const mapRef = createRef();
+    const tabsRef = createRef();
+    let sliderHeight = 25;
 
     useEffect(() => {
         if(route.params.id){
@@ -40,12 +42,9 @@ const Campaign = ({navigation, route}: Props) => {
                 setData(data);
                 facadeService.updateCampaignPlayedData(data.id);
             });
+            setMapFlex((screenHeight - sliderHeight) / (2 * screenHeight))
+            setTabsFlex((screenHeight - sliderHeight) / (2 * screenHeight))
         }
-        translateX.setOffset(prevValues.x);
-        translateX.setValue(0);
-        translateY.setOffset(prevValues.y);
-        translateY.setValue(0);
-        baseScale.setValue(1);
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -58,94 +57,59 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
-    const MapPinchHandler = Animated.event([{
-        nativeEvent: {
-            scale: pinchScale
-        }}],
-        {
-            useNativeDriver: true
-        });
-
-    const minZoom = 0.25;
-    const maxZoom = 4;
-
-    const pinchStateChanged = ({nativeEvent}) => {
-        if (nativeEvent.oldState === State.ACTIVE) {
-            prevValues.scale *= nativeEvent.scale;
-            baseScale.setValue(prevValues.scale);
-            pinchScale.setValue(1);
-            if (baseScale.__getValue() > maxZoom) {
-                baseScale.setValue(maxZoom);
-                prevValues.scale = maxZoom;
-            } else if (baseScale.__getValue() < minZoom) {
-                baseScale.setValue(minZoom);
-                prevValues.scale = minZoom;
-            }
-        }
-    };
-
     const panStateChanged = ({nativeEvent}) => {
-        if (nativeEvent.oldState === State.ACTIVE) {
-            prevValues.x += nativeEvent.translationX;
-            prevValues.y += nativeEvent.translationY;
-            translateX.setOffset(prevValues.x);
-            translateX.setValue(0);
-            translateY.setOffset(prevValues.y);
-            translateY.setValue(0);
-        }
-    };
+            if (nativeEvent.oldState === State.ACTIVE) {
+                setMapFlex(mapFlex + (nativeEvent.translationY - sliderHeight) / screenHeight);
+                setTabsFlex(tabsFlex - (nativeEvent.translationY - sliderHeight) / screenHeight);
+                if (mapFlex.__value > 0.99 || tabsFlex.__value < 0.01) {
+                    setMapFlex(0.99);
+                    setTabsFlex(0.01);
+                }
+                sliderPos.setValue(0);
+            }
+        };
 
-    const MapPanHandler = Animated.event([{
-        nativeEvent: {
-            translationX: translateX,
-            translationY: translateY
-        }}],
-        {
-            useNativeDriver: true
-        });
-
-    const pinchRef = createRef()
-    const panRef = createRef()
+    const proportionPanHandler = Animated.event([{
+            nativeEvent: {
+                translationY: sliderPos
+            }}],
+            {
+                useNativeDriver: true
+            });
 
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <Animated.View
-                style={myStyles.mapView}
+            <View
+                style={{
+                    zIndex: -1,
+                    flex: mapFlex,
+                    overflow: 'visible'
+                }}
+                ref={mapRef}
             >
+                <CampaignMap route={route}/>
+            </View>
+            <View>
                 <PanGestureHandler
-                    onGestureEvent={MapPanHandler}
+                    onGestureEvent={proportionPanHandler}
                     onHandlerStateChange={panStateChanged}
-                    ref={panRef}
-                    simultaneousHandlers={[pinchRef]}
-                    shouldCancelWhenOutside
                 >
-                    <Animated.View>
-                        <PinchGestureHandler
-                            onGestureEvent={MapPinchHandler}
-                            onHandlerStateChange={pinchStateChanged}
-                            ref={pinchRef}
-                            simultaneousHandlers={[panRef]}
-                        >
-                            <Animated.Image
-                                style={{
-                                    width: '100%',
-                                    height: '100%',
-                                    transform: [
-                                        {translateX},
-                                        {translateY},
-                                        {scale}
-                                    ]
-                                }}
-                                source={{
-                                    uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
-                                }}
-                            />
-                        </PinchGestureHandler>
-                    </Animated.View>
+                    <Animated.View
+                        style={{
+                            width: '100%',
+                            height: sliderHeight,
+                            backgroundColor: 'blue',
+                        }}
+                    />
                 </PanGestureHandler>
-            </Animated.View>
-            <View style={myStyles.tabsView}>
+            </View>
+            <View
+                style={{
+                    flex: tabsFlex
+                }}
+                ref={tabsRef}
+            >
                 <NavigationContainer independent={true}>
                     <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: appStyles.secondaryBackground, tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
                         <Tab.Screen name='Dice' component={DiceTab}/>
@@ -164,11 +128,11 @@ const myStyles = StyleSheet.create({
         flexDirection: 'column',
     },
     mapView: {
-        flex: 1,
+        flex: 0.5,
         zIndex: -1,
     },
     tabsView: {
-        flex: 1,
+        flex: 0.5,
     }
 })
 

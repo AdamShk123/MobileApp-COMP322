@@ -110,6 +110,7 @@ const CampaignMap = ({route}: Props) => {
                                 zIndex: -1,
                                 width: '100%',
                                 height: '100%',
+                                position: 'fixed',
                                 transform: [
                                     {translateX},
                                     {translateY},
@@ -129,6 +130,7 @@ const CampaignMap = ({route}: Props) => {
             <Animated.View
                 style={{
                     zIndex: 1,
+                    position: 'absolute',
                     transform: [
                         {translateX},
                         {translateY},

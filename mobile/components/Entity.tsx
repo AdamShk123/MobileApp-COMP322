@@ -31,7 +31,7 @@ const Entity = ({route}: Props) => {
         translateY.setOffset(prevValues.y);
         translateY.setValue(0);
         baseScale.setValue(1);
-        setEntityDimensions({width: 500, height: 500});
+        setEntityDimensions({width: 100, height: 100});
     }, [route.params]);
     if(!route.params.id && !id){
         return (<></>);
@@ -83,7 +83,7 @@ const Entity = ({route}: Props) => {
     return (
         <Animated.View
             style={{
-                position: 'fixed',
+                position: 'absolute',
                 top: 0,
                 transform: [
                     {translateX},
@@ -97,7 +97,6 @@ const Entity = ({route}: Props) => {
                 onHandlerStateChange={panStateChanged}
                 ref={panRef}
                 simultaneousHandlers={[pinchRef]}
-                shouldCancelWhenOutside
             >
                 <Animated.View>
                     <PinchGestureHandler
@@ -109,8 +108,8 @@ const Entity = ({route}: Props) => {
                         <Animated.Image
                             style={{
                                 zIndex: -1,
-                                width: '100%',
-                                height: '100%',
+                                width: entityDimensions.width,
+                                height: entityDimensions.height,
                             }}
                             source={{
                                 uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'

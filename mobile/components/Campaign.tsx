@@ -1,4 +1,4 @@
-import { StyleSheet, View, Button, Text, Image, Animated } from "react-native";
+import { StyleSheet, View, Button, Text, Image, Animated, Dimensions } from "react-native";
 import {NativeStackScreenProps} from '@react-navigation/native-stack';
 import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import appStyles from '../styles';
@@ -7,7 +7,7 @@ import { useContext, useEffect, useState, useRef, createRef, createContext } fro
 import { CampaignType } from "../types/Campaign";
 import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import { API_URL } from '@env';
-import { Gesture, GestureDetector, GestureEvent, GestureStateChangeEvent, PanGestureHandler, PinchGestureHandler, State, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
+import { Gesture, GestureDetector, GestureEvent, GestureStateChangeEvent, PanGestureHandler, State, TapGestureHandler, TapGestureHandlerEventPayload } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import FooterBar from './FooterBar';
 import { NavigationContainer } from "@react-navigation/native";
@@ -19,6 +19,7 @@ import { CampaignRealm, ChatRoom } from "../models/Campaign";
 import { CanonicalObjectSchema, List, ObjectChangeCallback } from "realm";
 import { Results, Object } from "realm/dist/bundle";
 import CharacterSheetTab from "./CharacterSheetTab";
+import CampaignMap from "./CampaignMap";
 
 export type TabParamList = {
     Dice: undefined,
@@ -35,12 +36,12 @@ const Campaign = ({navigation, route}: Props) => {
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
-    const baseScale = useRef(new Animated.Value(1)).current;
-    const pinchScale = useRef(new Animated.Value(1)).current;
-    const scale = useRef(Animated.multiply(baseScale, pinchScale)).current;
-    const translateX = useRef(new Animated.Value(0)).current;
+    const screenHeight = Dimensions.get('window').height;
     const translateY = useRef(new Animated.Value(0)).current;
-    let prevValues = {x: 0, y: 0, scale: 1};
+    const sliderHeight = 25;
+    const [heights, setHeights] = useState({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)}); // I'm manually figuring what the heights of the views should be as flex values don't seem to like being animated
+    const defaultY = 50 + heights.map;
+    let prevY = defaultY;
 
     const campaign = useQuery(CampaignRealm, campaigns => {
         return campaigns
@@ -64,11 +65,7 @@ const Campaign = ({navigation, route}: Props) => {
                 facadeService.updateCampaignPlayedData(data.id);
             });
         }
-        translateX.setOffset(prevValues.x);
-        translateX.setValue(0);
-        translateY.setOffset(prevValues.y);
         translateY.setValue(0);
-        baseScale.setValue(1);
 
         realm?.subscriptions.update((subs) => {
             subs.add(campaign, {name:"campaign"});
@@ -89,53 +86,19 @@ const Campaign = ({navigation, route}: Props) => {
         );
     }
 
-    const MapPinchHandler = Animated.event([{
-        nativeEvent: {
-            scale: pinchScale
-        }}],
-        {
-            useNativeDriver: true
-        });
-
-    const minZoom = 0.25;
-    const maxZoom = 4;
-
-    const pinchStateChanged = ({nativeEvent}) => {
-        if (nativeEvent.oldState === State.ACTIVE) {
-            prevValues.scale *= nativeEvent.scale;
-            baseScale.setValue(prevValues.scale);
-            pinchScale.setValue(1);
-            if (baseScale.__getValue() > maxZoom) {
-                baseScale.setValue(maxZoom);
-                prevValues.scale = maxZoom;
-            } else if (baseScale.__getValue() < minZoom) {
-                baseScale.setValue(minZoom);
-                prevValues.scale = minZoom;
-            }
-        }
-    };
-
     const panStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
-            prevValues.x += nativeEvent.translationX;
-            prevValues.y += nativeEvent.translationY;
-            translateX.setOffset(prevValues.x);
-            translateX.setValue(0);
-            translateY.setOffset(prevValues.y);
+            prevY += nativeEvent.translationY;
             translateY.setValue(0);
         }
     };
-
     const MapPanHandler = Animated.event([{
         nativeEvent: {
-            translationX: translateX,
             translationY: translateY
         }}],
         {
             useNativeDriver: true
         });
-
-    const pinchRef = createRef()
     const panRef = createRef()
 
     function tapCallback(event: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) {
@@ -152,43 +115,26 @@ const Campaign = ({navigation, route}: Props) => {
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <GestureDetector gesture={tap}>
-                <Animated.View
-                    style={myStyles.mapView}
-                >
-                    <PanGestureHandler
-                        onGestureEvent={MapPanHandler}
-                        onHandlerStateChange={panStateChanged}
-                        ref={panRef}
-                        simultaneousHandlers={[pinchRef]}
-                        shouldCancelWhenOutside
-                    >
-                        <Animated.View>
-                            <PinchGestureHandler
-                                onGestureEvent={MapPinchHandler}
-                                onHandlerStateChange={pinchStateChanged}
-                                ref={pinchRef}
-                                simultaneousHandlers={[panRef]}
-                            >
-                                <Animated.Image
-                                    style={{
-                                        width: '100%',
-                                        height: '100%',
-                                        transform: [
-                                            {translateX},
-                                            {translateY},
-                                            {scale}
-                                        ]
-                                    }}
-                                    source={{
-                                        uri: API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'
-                                    }}
-                                />
-                            </PinchGestureHandler>
-                        </Animated.View>
-                    </PanGestureHandler>
+                <Animated.View style={{height: heights.map}}>
+                    <CampaignMap route={route} characters={characters}/>
                 </Animated.View>
             </GestureDetector>
-            <View style={myStyles.tabsView}>
+            <Animated.View>
+                <PanGestureHandler
+                    onGestureEvent={MapPanHandler}
+                    onHandlerStateChange={panStateChanged}
+                    ref={panRef}
+                >
+                    <Animated.View
+                        style={{
+                            height: sliderHeight,
+                            backgroundColor: 'blue',
+                            width: '100%'
+                        }}
+                    />
+                </PanGestureHandler>
+            </Animated.View>
+            <Animated.View style={{height: heights.tabs}}>
                 <CampaignContext.Provider value={c}>
                     <NavigationContainer independent={true}>
                         <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: [appStyles.secondaryBackground, {height: 50}], tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>
@@ -198,7 +144,7 @@ const Campaign = ({navigation, route}: Props) => {
                         </Tab.Navigator>
                     </NavigationContainer>
                 </CampaignContext.Provider>
-            </View>
+            </Animated.View>
             <FooterBar current={screen}/>
         </View>
     );
@@ -210,11 +156,9 @@ const myStyles = StyleSheet.create({
         flexDirection: 'column',
     },
     mapView: {
-        flex: 1,
         zIndex: -1,
     },
     tabsView: {
-        flex: 1,
     }
 })
 

@@ -1,10 +1,12 @@
 import { View, StyleSheet, Pressable, Text, Dimensions } from "react-native";
 import appStyles from '../styles';
-import { TabParamList } from './Campaign';
+import { CampaignContext, TabParamList } from './Campaign';
 import {MaterialTopTabNavigationProp} from '@react-navigation/material-top-tabs';
 import { useState, useContext } from "react";
 import Slider from '@react-native-community/slider';
 import { ServiceContext } from "../App";
+import { useRealm } from "@realm/react";
+import { Message } from "../models/Campaign";
 
 type Props = {
     navigation: MaterialTopTabNavigationProp<TabParamList>;
@@ -18,9 +20,17 @@ const DiceTab = ({navigation}: Props) => {
 
     const facadeService = useContext(ServiceContext);
 
+    const campaign = useContext(CampaignContext);
+
+    const realm = useRealm();
+
     const onPress = () => {
         const num = Math.ceil(Math.random() * sides);
         setNum(num);
+        realm.write(() => {
+            const character = campaign?.characters.filtered("user_id == $0", facadeService.getCurrentUser().id).at(0);
+            campaign?.chatRooms.at(0)?.messages.push({sent: character?.name, text: character?.name + " threw a D" + sides + " and got " + num + ".", time: new Date()} as Message);      
+        });
     };
 
     return (

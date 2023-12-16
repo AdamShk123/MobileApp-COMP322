@@ -19,6 +19,7 @@
     "@react-navigation/material-top-tabs": "^6.6.5",
     "@react-navigation/native": "^6.1.7",
     "@react-navigation/native-stack": "^6.9.13",
+    "@realm/react": "^0.6.1",
     "@supabase/realtime-js": "^2.8.1",
     "@supabase/supabase-js": "^2.37.0",
     "@types/react-native-vector-icons": "^6.4.15",
@@ -42,6 +43,7 @@
     "react-native-tab-view": "^3.5.2",
     "react-native-url-polyfill": "^2.0.0",
     "react-native-vector-icons": "^10.0.0",
+    "realm": "^12.3.0",
     "tls": "^0.0.1"
   },
   "devDependencies": {

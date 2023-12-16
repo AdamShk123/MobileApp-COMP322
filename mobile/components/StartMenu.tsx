@@ -3,12 +3,15 @@ import {View, Text, Pressable, StyleSheet, Image} from 'react-native'
 import appStyles from '../styles'
 import {NativeStackNavigationProp} from '@react-navigation/native-stack'
 import { RootStackParamList } from '../App';
+import { useApp } from '@realm/react';
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
 }
 
 const StartMenu = ({navigation}: Props) => {
+    const app = useApp();
+
     return (
         <View style={[myStyles.componentView, appStyles.primaryBackground]}>
             <View style={myStyles.topView}>

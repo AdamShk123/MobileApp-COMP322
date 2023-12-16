@@ -101,13 +101,16 @@ const CampaignMap = ({route, characters, initialSize}: Props) => {
     });
 
     return (
-        <Animated.View>
+        <Animated.View
+            style={{
+                height: Dimensions.get('window').height
+            }}
+        >
             <PanGestureHandler
                 onGestureEvent={MapPanHandler}
                 onHandlerStateChange={panStateChanged}
                 ref={panRef}
                 simultaneousHandlers={[pinchRef]}
-                shouldCancelWhenOutside
             >
                 <Animated.View>
                     <PinchGestureHandler

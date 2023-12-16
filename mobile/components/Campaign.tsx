@@ -40,9 +40,7 @@ const Campaign = ({navigation, route}: Props) => {
     const translateY = useRef(new Animated.Value(0)).current;
     const sliderHeight = 25;
     const [heights, setHeights] = useState({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)}); // I'm manually figuring what the heights of the views should be as flex values don't seem to like being animated
-    const defaultY = 50 + heights.map;
     totalHeight = 2 * heights.map;
-    let prevY = defaultY;
 
     const campaign = useQuery(CampaignRealm, campaigns => {
         return campaigns
@@ -91,9 +89,8 @@ const Campaign = ({navigation, route}: Props) => {
 
     const panStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
-            prevY += nativeEvent.translationY;
+            setHeights({map: heights.map + nativeEvent.translationY, tabs: heights.tabs - nativeEvent.translationY});
             translateY.setValue(0);
-            setHeights({map: prevY, tabs: totalHeight - prevY});
         }
     };
     const MapPanHandler = Animated.event([{
@@ -119,7 +116,7 @@ const Campaign = ({navigation, route}: Props) => {
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <GestureDetector gesture={tap}>
-                <Animated.View style={{height: heights.map, zIndex: -1}}>
+                <Animated.View style={{flex: heights.map, zIndex: -1}}>
                     <CampaignMap route={route} characters={characters} initialSize={{width: Dimensions.get('window').width, height: heights.map}}/>
                 </Animated.View>
             </GestureDetector>
@@ -133,12 +130,13 @@ const Campaign = ({navigation, route}: Props) => {
                         style={{
                             height: sliderHeight,
                             backgroundColor: 'blue',
-                            width: '100%'
+                            width: '100%',
+                            zIndex: 1
                         }}
                     />
                 </PanGestureHandler>
             </Animated.View>
-            <Animated.View style={{height: heights.tabs}}>
+            <Animated.View style={{flex: heights.tabs}}>
                 <CampaignContext.Provider value={c}>
                     <NavigationContainer independent={true}>
                         <Tab.Navigator screenOptions={{tabBarLabelStyle: appStyles.primaryText,tabBarStyle: [appStyles.secondaryBackground, {height: 50}], tabBarIndicatorStyle: {backgroundColor: appStyles.primaryText.color}}}>

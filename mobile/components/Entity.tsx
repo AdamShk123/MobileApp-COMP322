@@ -6,7 +6,7 @@ import { RootStackParamList, ServiceContext, ScreenContext } from '../App';
 import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gesture-handler';
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 
-const Entity = ({route, character}: Props) => {
+const Entity = ({route, character, initialSize}: Props) => {
     const [data, setData] = useState({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
@@ -124,17 +124,18 @@ const Entity = ({route, character}: Props) => {
                             onLoad={(event) => {
                                 let imgWidth = event.nativeEvent.source.width;
                                 let imgHeight = event.nativeEvent.source.height;
-                                let screenWidth = Dimensions.get('window').width;
-                                let screenHeight = Dimensions.get('window').height;
-                                if (imgWidth > imgHeight) {
-                                    defaultScale.setValue(imgHeight);
+                                let scaling = imgWidth / imgHeight
+                                if (scaling > 1) {
+                                    setDimensions({
+                                        width: scaling * initialSize.height / 5,
+                                        height: initialSize.height / 5
+                                    });
                                 } else {
-                                    defaultScale.setValue(imgWidth);
+                                    setDimensions({
+                                        width: initialSize.width / 5,
+                                        height: scaling * initialSize.width / 5
+                                    })
                                 }
-                                setDimensions({
-                                    width: imgWidth,
-                                    height: imgHeight
-                                });
                             }}
                         />
                     </PinchGestureHandler>

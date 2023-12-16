@@ -7,7 +7,7 @@ import { PanGestureHandler, PinchGestureHandler, State } from 'react-native-gest
 type Props = NativeStackScreenProps<RootStackParamList, 'Campaign'>;
 import Entity from './Entity';
 
-const CampaignMap = ({route, characters}: Props) => {
+const CampaignMap = ({route, characters, initialSize}: Props) => {
     const [data, setData] = useState({name: 'defaultName', id: 'defaultID', ongoing: true, created: new Date()});
     const [id, setID] = useState('');
     const facadeService = useContext(ServiceContext);
@@ -36,7 +36,7 @@ const CampaignMap = ({route, characters}: Props) => {
         translateY.setOffset(prevValues.y);
         translateY.setValue(0);
         baseScale.setValue(1);
-        setEntities([]);
+        setEntities([2, 3]);
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -50,8 +50,8 @@ const CampaignMap = ({route, characters}: Props) => {
         {
             useNativeDriver: true
         });
-    const minZoom = 0.25;
-    const maxZoom = 4;
+    const minZoom = 1;
+    const maxZoom = 8;
     const pinchStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
             prevValues.scale *= nativeEvent.scale;
@@ -97,7 +97,7 @@ const CampaignMap = ({route, characters}: Props) => {
     }
 
     const entityMap = entities.map(entity => {
-        return <Entity route={route} character={characters}/>;
+        return <Entity route={route} character={characters} initialSize={initialSize}/>;
     });
 
     return (
@@ -134,12 +134,18 @@ const CampaignMap = ({route, characters}: Props) => {
                             onLoad={(event) => {
                                 let imgWidth = event.nativeEvent.source.width;
                                 let imgHeight = event.nativeEvent.source.height;
-                                let screenWidth = Dimensions.get('window').width;
-                                let screenHeight = Dimensions.get('window').height;
-                                setDimensions({
-                                    width: imgWidth,
-                                    height: imgHeight
-                                });
+                                let scaling = imgWidth / imgHeight
+                                if (scaling > 1) {
+                                    setDimensions({
+                                        width: scaling * initialSize.height,
+                                        height: initialSize.height
+                                    });
+                                } else {
+                                    setDimensions({
+                                        width: initialSize.width,
+                                        height: scaling * initialSize.width
+                                    })
+                                }
                             }}
                         />
                     </PinchGestureHandler>

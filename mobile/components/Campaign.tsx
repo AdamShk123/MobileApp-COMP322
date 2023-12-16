@@ -41,6 +41,7 @@ const Campaign = ({navigation, route}: Props) => {
     const sliderHeight = 25;
     const [heights, setHeights] = useState({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)}); // I'm manually figuring what the heights of the views should be as flex values don't seem to like being animated
     const defaultY = 50 + heights.map;
+    totalHeight = 2 * heights.map;
     let prevY = defaultY;
 
     const campaign = useQuery(CampaignRealm, campaigns => {
@@ -72,6 +73,8 @@ const Campaign = ({navigation, route}: Props) => {
             subs.add(characters, {name:"characters"});
             subs.add(chat, {name: 'chats'});
         });
+
+        setHeights({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)});
     }, [route.params]);
 
     const c = useObject(CampaignRealm, data.id.toString());
@@ -90,6 +93,7 @@ const Campaign = ({navigation, route}: Props) => {
         if (nativeEvent.oldState === State.ACTIVE) {
             prevY += nativeEvent.translationY;
             translateY.setValue(0);
+            setHeights({map: prevY, tabs: totalHeight - prevY});
         }
     };
     const MapPanHandler = Animated.event([{
@@ -115,8 +119,8 @@ const Campaign = ({navigation, route}: Props) => {
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
             <GestureDetector gesture={tap}>
-                <Animated.View style={{height: heights.map}}>
-                    <CampaignMap route={route} characters={characters}/>
+                <Animated.View style={{height: heights.map, zIndex: -1}}>
+                    <CampaignMap route={route} characters={characters} initialSize={{width: Dimensions.get('window').width, height: heights.map}}/>
                 </Animated.View>
             </GestureDetector>
             <Animated.View>

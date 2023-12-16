@@ -113,7 +113,7 @@ const Campaign = ({navigation, route}: Props) => {
             const character = c?.characters.filtered("user_id == $0", facadeService.getCurrentUser().id).at(0);
             character!.position = {x: Math.round(event.x), y: Math.round(event.y)} as Position;
         });
-    }
+    } // <GestureDetector gesture={tap}></GestureDetector> is how you would get this to work but it caused issues with the slider
 
     const tap = Gesture.Tap();
     tap.onEnd(tapCallback);
@@ -121,11 +121,9 @@ const Campaign = ({navigation, route}: Props) => {
     return (
         <View style={[appStyles.primaryBackground, myStyles.componentView]}>
             <HeaderBar navigation={navigation} headerText={data.name}/>
-            <GestureDetector gesture={tap}>
-                <Animated.View style={{height: heights.map, zIndex: -1}}>
-                    <CampaignMap route={route} characters={characters} initialSize={{width: Dimensions.get('window').width, height: heights.map}}/>
-                </Animated.View>
-            </GestureDetector>
+            <Animated.View style={{height: heights.map, zIndex: -1}}>
+                <CampaignMap route={route} characters={characters} initialSize={{width: Dimensions.get('window').width, height: heights.map}}/>
+            </Animated.View>
             <Animated.View>
                 <PanGestureHandler
                     onGestureEvent={MapPanHandler}

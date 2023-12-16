@@ -36,7 +36,7 @@ const CampaignMap = ({route, characters, initialSize}: Props) => {
         translateY.setOffset(prevValues.y);
         translateY.setValue(0);
         baseScale.setValue(1);
-        setEntities([2, 3]);
+        setEntities([2, 3]); // This is the list of initial npc and player characters and the like, could also be used for stuff like environmental objects, but right now its just dummy data to demonstrate entities
     }, [route.params]);
 
     if(!route.params.id && !id){
@@ -97,7 +97,7 @@ const CampaignMap = ({route, characters, initialSize}: Props) => {
     }
 
     const entityMap = entities.map(entity => {
-        return <Entity route={route} character={characters} initialSize={initialSize}/>;
+        return <Entity route={route} character={characters} initialSize={initialSize}/>; // We would feed specific character information in to actually render it, but right now that isn't implemented, so i just put "characters" where it would go
     });
 
     return (

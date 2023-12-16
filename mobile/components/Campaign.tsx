@@ -39,7 +39,7 @@ const Campaign = ({navigation, route}: Props) => {
     const screenHeight = Dimensions.get('window').height;
     const translateY = useRef(new Animated.Value(0)).current;
     const sliderHeight = 25;
-    const [heights, setHeights] = useState({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)}); // I'm manually figuring what the heights of the views should be as flex values don't seem to like being animated
+    const [heights, setHeights] = useState({map: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2), tabs: ((screenHeight - 50 - 70 - 24 - sliderHeight) / 2)}); // I'm manually figuring what the heights of the views should be to make the slider bar more accurate
     totalHeight = 2 * heights.map;
 
     const campaign = useQuery(CampaignRealm, campaigns => {

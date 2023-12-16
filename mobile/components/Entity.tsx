@@ -20,7 +20,7 @@ const Entity = ({route, character, initialSize}: Props) => {
     const pinchRef = createRef();
     const panRef = createRef();
     const entityRef = createRef();
-    const spriteSource = API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png';
+    const spriteSource = API_URL + '/storage/v1/object/public/campaigns/' + data.id + '/main.png'; // We would replace this with a sprite uri in actual use, but its just the map for demonstration
     const minZoom = 0.25;
     const maxZoom = 4;
     const [dimensions, setDimensions] = useState({width: 0, height: 0})

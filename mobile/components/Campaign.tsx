@@ -89,7 +89,6 @@ const Campaign = ({navigation, route}: Props) => {
 
     const panStateChanged = ({nativeEvent}) => {
         if (nativeEvent.oldState === State.ACTIVE) {
-            console.log("Map:  " + heights.map + " Tabs: " + heights.tabs + " Sum: " + (heights.map + heights.tabs) + " Total: " + totalHeight);
             if (heights.map + nativeEvent.translationY < 0) {
                 setHeights({map: 0, tabs: totalHeight})
             } else if (heights.tabs - nativeEvent.translationY < 0) {
@@ -97,7 +96,6 @@ const Campaign = ({navigation, route}: Props) => {
             } else {
                 setHeights({map: heights.map + nativeEvent.translationY, tabs: heights.tabs - nativeEvent.translationY});
             }
-
             translateY.setValue(0);
         }
     };

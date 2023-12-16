@@ -4,7 +4,7 @@ import { CampaignContext, TabParamList } from './Campaign';
 import { useContext, useEffect, useRef, useState } from "react";
 import { ServiceContext } from "../App";
 import { NativeStackScreenProps } from "@react-navigation/native-stack";
-import { ChatRoom, Message } from "../models/Campaign";
+import { CampaignRealm, ChatRoom, Message } from "../models/Campaign";
 import { useObject, useRealm } from "@realm/react";
 import { Character } from "../models/Character";
 
@@ -30,6 +30,7 @@ const ChatTab = ({route, navigation}: Props) => {
     const [list, setList] = useState<Message[]>([]);
     const [text, setText] = useState<string>('');
     const [added, setAdded] = useState<boolean>(false);
+    const [last, setLast] = useState<CampaignRealm>();
 
     const facadeService = useContext(ServiceContext);
 
@@ -53,18 +54,23 @@ const ChatTab = ({route, navigation}: Props) => {
     }
 
     useEffect(() => {
-        if(campaign && !added) {
+        console.log(campaign, added);
+        if(campaign && !added || campaign?._id != last?._id) {
+            console.log('campaig');
             campaign?.chatRooms.at(0)?.messages.addListener(onMessagesChange);
-            campaign.characters.forEach((character) => {
+            campaign?.characters.forEach((character) => {
                 character.addListener(onCharacterChange);
             });
             setAdded(true);
+            setLast(campaign!);
         }
+        console.log('here');
     }, [campaign]);
 
     function submit() {
         realm.write(() => {
-            campaign?.chatRooms.at(0)?.messages.push({sent: "Gandalf", text: text, time: new Date()} as Message);      
+            const character = campaign?.characters.filtered("user_id == $0", facadeService.getCurrentUser().id).at(0);
+            campaign?.chatRooms.at(0)?.messages.push({sent: character?.name, text: text, time: new Date()} as Message);      
         });
     }
 

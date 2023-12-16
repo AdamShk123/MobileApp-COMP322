@@ -28,7 +28,8 @@ const DiceTab = ({navigation}: Props) => {
         const num = Math.ceil(Math.random() * sides);
         setNum(num);
         realm.write(() => {
-            campaign?.chatRooms.at(0)?.messages.push({sent: "Gandalf", text: "Gandalf threw a D" + sides + " and got " + num + ".", time: new Date()} as Message);      
+            const character = campaign?.characters.filtered("user_id == $0", facadeService.getCurrentUser().id).at(0);
+            campaign?.chatRooms.at(0)?.messages.push({sent: character?.name, text: character?.name + " threw a D" + sides + " and got " + num + ".", time: new Date()} as Message);      
         });
     };
 

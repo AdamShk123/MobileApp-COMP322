@@ -6,6 +6,9 @@ import HeaderBar from './HeaderBar';
 import { useContext, useEffect, useState } from "react";
 import { launchImageLibrary } from "react-native-image-picker";
 import FooterBar from './FooterBar';
+import { useQuery, useRealm } from "@realm/react";
+import { CampaignRealm, ChatRoom } from "../models/Campaign";
+import { Character } from "../models/Character";
 
 type Props = {
     navigation: NativeStackNavigationProp<RootStackParamList>;
@@ -23,18 +26,48 @@ const AddCampaign = ({navigation}: Props) => {
     const facadeService = useContext(ServiceContext);
     const screen = useContext(ScreenContext);
 
+    const campaign = useQuery(CampaignRealm, campaigns => {
+        return campaigns
+    });
+    const characters = useQuery(Character, characters => {
+        return characters;
+    });
+    const chats = useQuery(ChatRoom, chats => {
+        return chats
+    });
+
+    const realm = useRealm();
+
     function onButtonPressed(){
         if(!disabled) {
             const id = facadeService.getCurrentUser().id;
             const promise = facadeService.createCampaign({cname: name, cdmid: id}); 
             promise.then((result) => {
-                setName('');
-                setDisabled(true);
-                setError('');
+                realm.removeAllListeners();
                 facadeService.uploadImage('campaigns', result.id, selectedBase).then((result) => {
                     console.log(result);
                     navigation.navigate('CampaignsList', {id: id});
                 });
+                realm.subscriptions.update((subs) => {
+                    subs.add(campaign, {name:"campaign"});
+                    subs.add(characters, {name:"characters"});
+                    subs.add(chats, {name: 'chats'});
+                });
+                realm.write(() => {
+                    const bid = Realm.BSON.ObjectID.createFromTime(new Date().getTime() / 1000);
+                    const character = {_id: bid, user_id: id.toString(), name: 'CharacterName', level: 1, class: 'Barbarian', race: 'Human', stats: {str: 10, dex: 10, int: 10, cha: 10, con: 10, wis: 10,}, status: {hp: 100, mp: 100}, position: {x: 0, y: 0}} as Character;
+                    const room_id = Realm.BSON.ObjectID.createFromTime((new Date().getTime() + 1000) / 1000);
+                    const room = {_id: room_id, name: 'all', characters: [], messages: []};
+                    realm.create(CampaignRealm, {_id: result.id.toString(), name: name, created: new Date(), characters: [character], chatRooms: [room]});
+                });
+                realm.subscriptions.update((subs) => {
+                    subs.remove(campaign);
+                    subs.remove(characters);
+                    subs.remove(chats);
+                });
+                setName('');
+                setDisabled(true);
+                setError('');
             });
         }
     }

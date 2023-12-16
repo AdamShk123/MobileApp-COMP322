@@ -53,7 +53,10 @@ const Campaign = ({navigation, route}: Props) => {
         return chats
     });
 
+    const realm = useRealm();
+
     useEffect(() => {
+        realm.removeAllListeners();
         if(route.params.id){
             setID(route.params.id);
             facadeService.getCampaign(route.params.id).then((data: CampaignType) => {
@@ -67,12 +70,14 @@ const Campaign = ({navigation, route}: Props) => {
         translateY.setValue(0);
         baseScale.setValue(1);
 
-        realm.subscriptions.update((subs) => {
+        realm?.subscriptions.update((subs) => {
             subs.add(campaign, {name:"campaign"});
             subs.add(characters, {name:"characters"});
             subs.add(chat, {name: 'chats'});
         });
     }, [route.params]);
+
+    const c = useObject(CampaignRealm, data.id.toString());
 
     if(!route.params.id && !id){
         return (
@@ -133,13 +138,10 @@ const Campaign = ({navigation, route}: Props) => {
     const pinchRef = createRef()
     const panRef = createRef()
 
-    const realm = useRealm();
-        
-    const c = useObject(CampaignRealm, data.id.toString());
-
     function tapCallback(event: GestureStateChangeEvent<TapGestureHandlerEventPayload>, success: boolean) {
         realm.write(() => {
-            characters.at(0)!.position = {x: Math.round(event.x), y: Math.round(event.y)} as Position;
+            const character = c?.characters.filtered("user_id == $0", facadeService.getCurrentUser().id).at(0);
+            character!.position = {x: Math.round(event.x), y: Math.round(event.y)} as Position;
         });
     }
 
